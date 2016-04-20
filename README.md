@@ -13,6 +13,8 @@ Note: This uses Python3
 
   `pip install -r requirements.txt`
   
+  a. If you don't already have postgresql-devel installed, you'll need to run `yum install python-devel postgresql-devel` first or else you'll get an error like `pg_config executable not found` when pip tries to install psycopg2.
+  
 4. Create settings.py (using settings.py.example as a template). 
 
   a. If you haven't already, you will need to [register a Facebook app](https://developers.facebook.com/docs/apps/register).
