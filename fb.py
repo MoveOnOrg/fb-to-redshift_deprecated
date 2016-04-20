@@ -31,11 +31,15 @@ def get_interactions(posts_dict):
     for post_id in posts_dict.keys():
         url = base_url + "%s?fields=likes.summary(true),shares.summary(true),comments.summary(true)&access_token=%s" %(post_id, fb_token)
         interactions = requests.get(url).json()
-        likes = interactions['likes']['summary']['total_count']
-        comments = interactions['comments']['summary']['total_count']
+        likes = interactions.get('likes', 0)
+        if likes != 0:
+            likes = interactions['likes']['summary']['total_count']
         shares = interactions.get('shares', 0)
         if shares != 0:
             shares = shares['count']
+        comments = interactions.get('comments', 0)
+        if comments != 0:
+            comments = interactions['comments']['summary']['total_count']
         posts_dict[post_id].append(likes)
         posts_dict[post_id].append(shares)
         posts_dict[post_id].append(comments)
