@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Redshift db settings
 db_user = ''
@@ -8,9 +7,10 @@ db_pwd = ''
 db_name = ''
 
 # Facebook Graph API settings
-fb_token = ''
-fb_version = ''
+fb_version = 'v#.#'
 fb_page_id = ''
+fb_client_id = ''
+fb_client_secret = ''
 
 # AWS settings
 aws_access_key = ''

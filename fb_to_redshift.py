@@ -4,16 +4,14 @@ from redshift import rsm
 from fb import get_posts, get_interactions
 from settings import aws_access_key, aws_secret_key, s3_bucket
 import boto
+import csv
 
 def create_import_file():
     import_file = open('fb_import_file.csv', 'w')
     fb_dict = get_interactions(get_posts())
-    post_ids = fb_dict.keys()
-    first_line = '%s,%s,%s,%s,%s,%s'%(post_ids[0], fb_dict[post_ids[0]][0], fb_dict[post_ids[0]][1], fb_dict[post_ids[0]][2], fb_dict[post_ids[0]][3], fb_dict[post_ids[0]][4])
-    import_file.write(first_line)
-    for post_id in post_ids[1:]:
-        line = '\n%s,%s,%s,%s,%s,%s'%(post_id, fb_dict[post_id][0], fb_dict[post_id][1], fb_dict[post_id][2], fb_dict[post_id][3], fb_dict[post_id][4])
-        import_file.write(line)
+    # post_ids = list(fb_dict.keys())
+    csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
+    csv_file.writerows([[post_id,]+post_values for post_id, post_values in fb_dict.items()])
     import_file.close()
 
 def upload_to_s3():
