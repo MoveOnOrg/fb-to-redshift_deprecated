@@ -1,0 +1,18 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Redshift db settings
+db_user = ''
+db_host = 'host:port'
+db_pwd = ''
+db_name = ''
+
+# Facebook Graph API settings
+fb_token = ''
+fb_version = ''
+fb_page_id = ''
+
+# AWS settings
+aws_access_key = ''
+aws_secret_key = ''
+s3_bucket = ''
