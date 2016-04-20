@@ -23,6 +23,6 @@ Note: This uses Python3
     
   c. You'll also need to have [created a bucket in s3](http://docs.aws.amazon.com/gettingstarted/latest/swh/getting-started-create-bucket.html).
   
-5. Run the script!
+5. Run the script! Note: This script can take a *long time* to run, due to pagination, if the page you're pulling posts from has a lot of posts.
   
   `python fb_to_redshift.py`
