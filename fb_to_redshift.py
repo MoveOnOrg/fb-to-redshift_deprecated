@@ -1,15 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from redshift import rsm
-from fb import get_posts, get_interactions
+from fb import get_posts, get_interactions, get_total_reach
 from settings import aws_access_key, aws_secret_key, s3_bucket
 import boto
 import csv
 
 def create_import_file():
     import_file = open('fb_import_file.csv', 'w')
-    fb_dict = get_interactions(get_posts())
-    # post_ids = list(fb_dict.keys())
+    fb_dict = get_total_reach(get_interactions(get_posts()))
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     csv_file.writerows([[post_id,]+post_values for post_id, post_values in fb_dict.items()])
     import_file.close()
@@ -26,14 +25,14 @@ def update_redshift():
 CREATE TABLE facebook.posts_staging (LIKE facebook.posts);
 
 -- Load data into the staging table 
-COPY facebook.posts_staging (post_id, message, created_time, likes, shares, comments) 
+COPY facebook.posts_staging (post_id, message, created_time, likes, shares, comments, total_reach) 
 FROM 's3://%s/fb_import_file.csv' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 delimiter ','; 
 
 -- Update records 
 UPDATE facebook.posts 
-SET message = s.message, created_time = s.created_time, likes = s.likes, shares = s.shares, comments = s.comments
+SET message = s.message, created_time = s.created_time, likes = s.likes, shares = s.shares, comments = s.comments, total_reach = s.total_reach
 FROM facebook.posts_staging s 
 WHERE facebook.posts.post_id = s.post_id; 
 
