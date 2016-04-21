@@ -17,7 +17,6 @@ def get_posts():
             created_time = post['created_time'].replace('T', ' ').replace('+0000', '')
             posts_dict[post['id']] = [message, created_time]
         if 'paging' in posts:
-            pagination = False
             posts = requests.get(posts['paging']['next']).json()
         else:
             pagination = False
