@@ -6,7 +6,7 @@ import requests
 base_url = "https://graph.facebook.com/%s/" %fb_version
 
 def get_posts():
-    url = base_url + "%s/posts?limit=100&access_token=%s|%s" %(fb_page_id, fb_client_id, fb_client_secret)
+    url = base_url + "%s/posts?limit=100&access_token=%s" %(fb_page_id, fb_long_token)
     posts = requests.get(url).json()
     post_ids = []
     posts_dict = {}
@@ -25,7 +25,7 @@ def get_posts():
 # this fn results in posts_dict = {post_id: [message, created_time, likes, shares, comments]}
 def get_interactions(posts_dict):
     for post_id in posts_dict.keys():
-        url = base_url + "%s?fields=likes.summary(true),shares.summary(true),comments.summary(true)&access_token=%s|%s" %(post_id, fb_client_id, fb_client_secret)
+        url = base_url + "%s?fields=likes.summary(true),shares.summary(true),comments.summary(true)&access_token=%s" %(post_id, fb_long_token)
         interactions = requests.get(url).json()
         likes = 0
         shares = 0
@@ -54,7 +54,9 @@ def get_total_reach(posts_dict):
 
 def get_long_lived_token():
     user_access_token = 'add your user access token here'
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' %(fb_client_id, fb_client_secret, user_access_token)
+    client_id = 'add your client id here'
+    client_secret = 'add your client secret here'
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' %(client_id, client_secret, user_access_token)
     token = requests.get(url)
     return token.text[13:]
 

@@ -9,8 +9,6 @@ db_name = ''
 # Facebook Graph API settings
 fb_version = 'v2.6'
 fb_page_id = ''
-fb_client_id = ''
-fb_client_secret = ''
 fb_long_token = ''
 
 # AWS settings

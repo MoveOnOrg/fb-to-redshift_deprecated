@@ -23,9 +23,10 @@ Note: This uses Python3.
     * To get your long access token, first go to [Facebook's Graph API Explorer](https://developers.facebook.com/tools/explorer) and make sure it is associated with your app (top right drop down).
     * Get your user access token, ensuring `manage_pages` and `read_insights` are both selected as permissions.
     * Add your user access token in as the value in the variable `user_access_token` in `get_long_lived_token()` in fb.py.
+    * Add your client id and client secret in the same variables in `get_long_lived_token()` in fb.py.
     * Uncomment line #67 (`# get_page_access_token_from_user_token(get_long_lived_token()`), and in your virtual env, run `python fb.py`.
     * Add the output of the script to settings.py as your `fb_long_token`. This never expires, so you're good to go!
-    * Recomment or delete line #67. 
+    * Recomment or delete line #67 or the associated functions if you wish.
     
   * You will also need to have [created a Redshift database](http://docs.aws.amazon.com/redshift/latest/dg/t_creating_database.html), and have your [AWS IAM credentials](https://aws.amazon.com/iam/). Make sure to create a table in the schema `facebook`, named `posts`. 
     
