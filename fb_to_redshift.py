@@ -5,10 +5,11 @@ from fb import get_posts_and_interactions, get_total_reach
 from settings import aws_access_key, aws_secret_key, s3_bucket
 import boto
 import csv
+import argparse
 
-def create_import_file():
+def create_import_file(interval='month'):
     import_file = open('fb_import_file.csv', 'w')
-    fb_dict = get_total_reach(get_posts_and_interactions('month'))
+    fb_dict = get_total_reach(get_posts_and_interactions(interval))
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     csv_file.writerows([[post_id,]+post_values for post_id, post_values in fb_dict.items()])
     import_file.close()
