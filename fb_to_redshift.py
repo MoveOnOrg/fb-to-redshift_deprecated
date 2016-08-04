@@ -8,7 +8,7 @@ import csv
 
 def create_import_file():
     import_file = open('fb_import_file.csv', 'w')
-    fb_dict = get_total_reach(get_posts_and_interactions())
+    fb_dict = get_total_reach(get_posts_and_interactions('month'))
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     csv_file.writerows([[post_id,]+post_values for post_id, post_values in fb_dict.items()])
     import_file.close()
