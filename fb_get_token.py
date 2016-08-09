@@ -12,7 +12,7 @@ def get_long_lived_token():
     return token.text[13:]
 
 def get_page_access_token_from_user_token(long_user_access_token):
-    url = base_url + '%s?fields=access_token&access_token=%s' %(fb_page_id, long_user_access_token)
+    url = base_url + '%s?fields=access_token&access_token=%s' %(fb_page_id, user_access_token)
     page_token = requests.get(url).json()
     print(page_token['access_token'])
     
