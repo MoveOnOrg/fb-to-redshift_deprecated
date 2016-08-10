@@ -26,11 +26,23 @@ Note: This uses Python3.
     * Add your app id and app secret in the client_id and client_secret variables in settings.py.
     * In your virtualenv, run `python fb_get_token.py`.
     * Add the output of the script to settings.py as your `fb_long_token`. This expires every 60 days.
+
+  * To obtain a never-expiring access token for production after registering the app and associating it with the page:
+
+    * Go to [Facebook's Graph API Explorer](https://developers.facebook.com/tools/explorer) and make sure it is associated with your app (top right drop down).
+    * Under Get Token, choose Get User Access Token, ensuring `manage_pages` and `read_insights` are both selected as permissions.
+    * Under Get Token > Page Access Tokens, chose MoveOn.org
+    * Click the little blue i to the left of the Token and note the expiration time. Choose Open in Access Token Tool.
+    * Click the blue Extend Access Token button at the bottom of the page. The Access Token toward the top of the page should change. 
+    * Click the "Debug" button to the right. "Expires" should show "Never"
+    * Paste this token into settings.py as the value for `fb_long_token` 
     
-  * You will also need to have [created a Redshift database](http://docs.aws.amazon.com/redshift/latest/dg/t_creating_database.html), and have your [AWS IAM credentials](https://aws.amazon.com/iam/). Make sure to create a table in the schema `facebook`, named `posts`. 
+  * You will also need to have [created a Redshift database](http://docs.aws.amazon.com/redshift/latest/dg/t_creating_database.html), and have your [AWS IAM credentials](https://aws.amazon.com/iam/). Make sure to create tables in the schema `facebook`, named `posts` and `videos`
     
     `CREATE TABLE facebook.posts(post_id VARCHAR(256) PRIMARY KEY, message VARCHAR(max), created_time timestamp, likes INT, shares INT, comments INT, total_reach INT);`
-    
+
+    `CREATE TABLE facebook.videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT, reach BIGINT, minutes_viewed BIGINT, unique_viewers INT, views_10sec INT, views_30sec INT, avg_completion DECIMAL(3,3));`
+
   * You'll also need to have [created a bucket in s3](http://docs.aws.amazon.com/gettingstarted/latest/swh/getting-started-create-bucket.html).
   
 5. Run the script! Note: This script can take a *long time* to run, due to pagination, if the page you're pulling posts from has a lot of posts.

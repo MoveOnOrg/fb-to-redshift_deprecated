@@ -166,7 +166,7 @@ def get_video_stats(interval = False):
                 except KeyError:
                     log_error(video,'error_log.json')
             
-            #parse insights
+            # parse insights
             insights = {}
             no_insights = False
             try:
@@ -175,16 +175,17 @@ def get_video_stats(interval = False):
                 no_insights = True
             for insight in insights_data:
                 insights[insight['name']] = insight['values'][0]['value']
-            
-            try:
-                shares = insights['total_video_stories_by_action_type']['share']
-            except KeyError:
-                shares = 0
 
             if no_insights:
                 videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions]
             else:
-                videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, insights['total_video_view_total_time'], insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], insights['total_video_avg_time_watched'], insights['total_video_impressions_unique'], shares]
+                try:
+                    shares = insights['total_video_stories_by_action_type']['share']
+                except KeyError:
+                    shares = 0
+                avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
+                print (str(video['id']) + ':  ' + str(avg_completion)) #debug
+                videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], avg_completion]
         try: 
             videos = requests.get(videos['paging']['next']).json()
         except KeyError:
@@ -194,6 +195,6 @@ def get_video_stats(interval = False):
     return videos_dict
 
 #for dev only
-#videos = get_video_stats()
-#for video in videos:
-#    print(video, videos[video])
+videos = get_video_stats()
+for video in videos:
+    print(video, videos[video])

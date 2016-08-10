@@ -7,27 +7,31 @@ import boto
 import csv
 import argparse
 
-def create_import_file(interval='month'):
-    import_file = open('fb_import_file.csv', 'w')
-    fb_dict = get_total_reach(get_posts_and_interactions(interval))
+def create_import_file(interval=False,import_type='posts'):
+    if import_type == 'posts':
+        import_file = open('fb_import_posts.csv', 'w')
+        data_dict = get_total_reach(get_posts_and_interactions(interval))
+    if import_type == 'videos':
+        import_file = open('fb_import_videos.csv', 'w')
+        data_dict = get_video_stats(interval)
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
-    csv_file.writerows([[post_id,]+post_values for post_id, post_values in fb_dict.items()])
+    csv_file.writerows([[id,]+values for id, values in data_dict.items()])
     import_file.close()
 
-def upload_to_s3():
+def upload_to_s3(filename='fb_import_posts.csv'):
     conn = boto.connect_s3(aws_access_key, aws_secret_key)
     bucket = conn.lookup(s3_bucket)
     k = boto.s3.key.Key(bucket) 
-    k.key = 'fb_import_file.csv'
-    k.set_contents_from_filename('fb_import_file.csv') 
+    k.key = filename
+    k.set_contents_from_filename(filename) 
 
-def update_redshift():
+def update_redshift_posts():
     command = """-- Create a staging table 
 CREATE TABLE facebook.posts_staging (LIKE facebook.posts);
 
 -- Load data into the staging table 
 COPY facebook.posts_staging (post_id, message, created_time, likes, shares, comments, total_reach) 
-FROM 's3://%s/fb_import_file.csv' 
+FROM 's3://%s/fb_import_posts.csv' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 delimiter ','; 
 
@@ -51,6 +55,38 @@ END;"""%(s3_bucket, aws_access_key, aws_secret_key)
 
     rsm.db_query(command)
 
-create_import_file()
-upload_to_s3()
-update_redshift()
+def update_redshift_videos():
+    command = """-- Create a staging table 
+CREATE TABLE facebook.videos_staging (LIKE facebook.videos);
+
+-- Load data into the staging table 
+COPY facebook.videos_staging (video_id, title, description, created_time, length, likes, comments, reactions, shares, reach, minutes_viewed, unique_viewers, views_10sec, views_30sec, avg_completion) 
+FROM 's3://%s/fb_import_videos.csv' 
+CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
+delimiter ','; 
+
+-- Update records 
+UPDATE facebook.videos 
+SET title = s.title, description = s.description, created_time = s.created_time, length = s.length, likes = s.likes, comments = s.comments, reactions = s.reactions, shares = s.shares, reach = s.reach, minutes_viewed = s.minutes_viewed, unique_viewers = s.unique_viewers, views_10sec = s.views_10sec, views_30sec = s.views_30sec, avg_completion = s.avg_completion
+WHERE facebook.videos.video_id = s.video_id; 
+
+-- Insert records 
+INSERT INTO facebook.videos 
+SELECT s.* FROM facebook.videos_staging s LEFT JOIN facebook.videos 
+ON s.post_id = facebook.videos.video_id
+WHERE facebook.videos.video_id IS NULL;
+
+-- Drop the staging table
+DROP TABLE facebook.videos_staging; 
+
+-- End transaction 
+END;"""%(s3_bucket, aws_access_key, aws_secret_key)
+
+    rsm.db_query(command)
+
+#create_import_file(False, 'posts')
+create_import_file(False, 'videos')
+#upload_to_s3('fb_import_posts.csv')
+upload_to_s3('fb_import_videos.csv')
+#update_redshift_posts()
+update_redshift_videos()
