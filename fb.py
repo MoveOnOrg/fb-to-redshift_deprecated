@@ -81,10 +81,8 @@ def get_posts_and_interactions(interval=False):
                     log_error(post,'error_log.json')
             posts_dict[post['id']] = [message, created_time, likes, shares, comments]
         if 'paging' in posts:
-            print('next page')
             posts = requests.get(posts['paging']['next']).json()
         else:
-            print('last page')
             pagination = False
 
     return posts_dict
@@ -102,7 +100,7 @@ def get_total_reach(posts_dict):
         posts_dict[post_id].append(total_reach)
     return posts_dict
 
-# this results in videos_dict = {video_id: [title, description, created_time, length, likes, comments, reactions, total_video_view_total_time, total_video_views_unique, total_video_10s_views_unique, total_video_30s_views_unique, total_video_avg_time_watched, total_video_impressions_unique, shares]}
+# this results in videos_dict = {video_id: [title, description, created_time, length, likes, comments, reactions, total_video_view_total_time, total_video_views_unique, total_video_10s_views_unique, total_video_30s_views_unique, avg_completion, total_video_impressions_unique, shares]}
 
 def get_video_stats(interval = False):
     now = int(time.time())
@@ -144,7 +142,7 @@ def get_video_stats(interval = False):
     while pagination:
         for video in videos['data']:
             title = video.get('title', '').replace('\n', ' ').replace(',', ' ')
-            description = video.get('description', '').replace('\n', ' ').replace(',', ' ')
+            description = video.get('description', '').replace('\n', ' ').replace(',', ' ').replace('"','')
             created_time = video['created_time'].replace('T', ' ').replace('+0000', '')
             length = video['length']
             likes = 0
@@ -166,7 +164,6 @@ def get_video_stats(interval = False):
                 except KeyError:
                     log_error(video,'error_log.json')
             
-            # parse insights
             insights = {}
             no_insights = False
             try:
@@ -175,7 +172,6 @@ def get_video_stats(interval = False):
                 no_insights = True
             for insight in insights_data:
                 insights[insight['name']] = insight['values'][0]['value']
-
             if no_insights:
                 videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions]
             else:
@@ -184,7 +180,6 @@ def get_video_stats(interval = False):
                 except KeyError:
                     shares = 0
                 avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
-                print (str(video['id']) + ':  ' + str(avg_completion)) #debug
                 videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], avg_completion]
         try: 
             videos = requests.get(videos['paging']['next']).json()
@@ -193,8 +188,3 @@ def get_video_stats(interval = False):
         # end while
 
     return videos_dict
-
-#for dev only
-videos = get_video_stats()
-for video in videos:
-    print(video, videos[video])

@@ -41,10 +41,14 @@ Note: This uses Python3.
     
     `CREATE TABLE facebook.posts(post_id VARCHAR(256) PRIMARY KEY, message VARCHAR(max), created_time timestamp, likes INT, shares INT, comments INT, total_reach INT);`
 
-    `CREATE TABLE facebook.videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT, reach BIGINT, minutes_viewed BIGINT, unique_viewers INT, views_10sec INT, views_30sec INT, avg_completion DECIMAL(3,3));`
+    `CREATE TABLE facebook.videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, minutes_viewed BIGINT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, avg_completion DECIMAL(3,3) NULL);`
 
   * You'll also need to have [created a bucket in s3](http://docs.aws.amazon.com/gettingstarted/latest/swh/getting-started-create-bucket.html).
+
+  * Note: the connection to S3 uses the boto library which has [excellent docs](https://boto3.readthedocs.io/en/latest/guide/migrations3.html#creating-the-connection).
   
 5. Run the script! Note: This script can take a *long time* to run, due to pagination, if the page you're pulling posts from has a lot of posts.
   
   `python fb_to_redshift.py`
+
+  * You can limit the timeframe from which a run of the script grabs posts by passing an argument (e.g. 'year', 'month', 'week') to the call to create_import_file() at the bottom of `fb_to_redshift.py`.
