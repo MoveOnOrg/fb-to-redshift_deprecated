@@ -7,11 +7,17 @@ db_pwd = ''
 db_name = ''
 
 # Facebook Graph API settings
-fb_version = 'v2.6'
+fb_version = 'v2.7'
 fb_page_id = ''
 fb_long_token = ''
+post_limit = '40'
 
 # AWS settings
 aws_access_key = ''
 aws_secret_key = ''
 s3_bucket = ''
+
+# Facebook user access settings
+user_access_token = ''
+client_id = ''
+client_secret = ''

@@ -2,3 +2,6 @@
 venv
 settings.py
 venv2
+*.json
+*.csv
+ve

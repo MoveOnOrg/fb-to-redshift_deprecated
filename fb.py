@@ -1,17 +1,62 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from settings import fb_version, fb_page_id, fb_long_token
+from settings import fb_version, fb_page_id, fb_long_token, post_limit
 import requests
+import json
+import sys
+import time
+import datetime
 
 base_url = "https://graph.facebook.com/%s/" %fb_version
 
+
+def log_error(content,logfile):
+    error_log = open(logfile,'a')
+    error_log.write(datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
+    json.dump(content, error_log, indent=4)
+    error_log.close()
+
 # this fn results in posts_dict = {post_id: [message, created_time, likes, shares, comments]}
-def get_posts_and_interactions():
-    url = base_url + '%s/posts?fields=message,created_time,id,likes.summary(true),comments.summary(true),shares&limit=40&access_token=%s' %(fb_page_id, fb_long_token)
-    posts = requests.get(url).json()
-    print(posts)
+# set interval = False to update all post data
+
+def get_posts_and_interactions(interval=False):
+    
+    now = int(time.time())
+    if interval == 'week':
+        since = str(now - 604800)
+    if interval == 'month':
+        since = str(now - 2592000)
+    if interval == 'year':
+        since = str(now - 31536000)
+    now = str(now)
+    
+    limit = post_limit
+    too_many_posts_at_a_time = True
+
+    while too_many_posts_at_a_time:
+        if interval:
+            url = base_url + '%s/posts?fields=message,created_time,id,likes.limit(0).summary(total_count),comments.limit(0).summary(total_count),shares&limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id, limit, since, now, fb_long_token)
+        else:
+            url = base_url + '%s/posts?fields=message,created_time,id,likes.limit(0).summary(true),comments.limit(0).summary(true),shares&limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
+        posts = requests.get(url).json()
+
+        if 'error' in posts:
+            log_error(posts,'error_log.json')
+            if posts['error']['code'] == 1:
+                print(str(limit) + ' is too high')
+                limit = str(int(limit) - 5) # try again with a smaller request
+            elif posts['error']['code'] == 190:
+                print('bad access_token! see error log for details')
+                break
+            else:
+                print('API error code ' + str(posts['error']['code']))
+                break
+        else:
+            too_many_posts_at_a_time = False
+
     posts_dict = {}
     pagination = True
+
     while pagination:
         for post in posts['data']:
             message = post.get('message', '').replace('\n', ' ').replace(',', ' ')
@@ -20,20 +65,31 @@ def get_posts_and_interactions():
             shares = 0
             comments = 0
             if 'likes' in post:
-                likes = post['likes']['summary']['total_count']
+                try:
+                    likes = post['likes']['summary']['total_count']
+                except KeyError:
+                    log_error(post,'error_log.json')
             if 'shares' in post:
-                shares = post['shares']['count']
+                try:
+                    shares = post['shares']['count']
+                except KeyError:
+                    log_error(post,'error_log.json')
             if 'comments' in post:
-                comments = post['comments']['summary']['total_count']
+                try:
+                    comments = post['comments']['summary']['total_count']
+                except KeyError:
+                    log_error(post,'error_log.json')
             posts_dict[post['id']] = [message, created_time, likes, shares, comments]
-            if 'paging' in posts:
-                posts = requests.get(posts['paging']['next']).json()
-            else:
-                pagination = False
+        if 'paging' in posts:
+            posts = requests.get(posts['paging']['next']).json()
+        else:
+            pagination = False
+
     return posts_dict
 
 
 # this fn results in posts_dict = {post_id: [message, created_time, likes, shares, comments, total_reach]}
+# TODO: rewrite this as a batch request https://developers.facebook.com/docs/graph-api/making-multiple-requests
 def get_total_reach(posts_dict):
     for post_id in posts_dict.keys():
         url = base_url + "%s/insights/post_impressions?period=lifetime&access_token=%s" %(post_id, fb_long_token)
@@ -44,17 +100,91 @@ def get_total_reach(posts_dict):
         posts_dict[post_id].append(total_reach)
     return posts_dict
 
-def get_long_lived_token():
-    user_access_token = 'add your user access token here'
-    client_id = 'add your client id here'
-    client_secret = 'add your client secret here'
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' %(client_id, client_secret, user_access_token)
-    token = requests.get(url)
-    return token.text[13:]
+# this results in videos_dict = {video_id: [title, description, created_time, length, likes, comments, reactions, total_video_view_total_time, total_video_views_unique, total_video_10s_views_unique, total_video_30s_views_unique, avg_completion, total_video_impressions_unique, shares]}
 
-def get_page_access_token_from_user_token(long_user_access_token):
-    url = base_url + '%s?fields=access_token&access_token=%s' %(fb_page_id, long_user_access_token)
-    page_token = requests.get(url).json()   
-    print(page_token['access_token'])
-    
-# get_page_access_token_from_user_token(get_long_lived_token())
+def get_video_stats(interval = False):
+    now = int(time.time())
+    if interval == 'week':
+        since = str(now - 604800)
+    if interval == 'month':
+        since = str(now - 2592000)
+    if interval == 'year':
+        since = str(now - 31536000)
+    now = str(now)
+
+    limit = post_limit
+    too_many_videos_at_a_time = True
+
+    while too_many_videos_at_a_time:
+        if interval:
+            url = base_url + '%s/videos?fields=title,description,created_time,length,comments.limit(0).summary(total_count),likes.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights{values,name}&limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id, limit, since, now, fb_long_token)
+        else:
+            url = base_url + '%s/videos?fields=title,description,created_time,length,comments.limit(0).summary(total_count),likes.limit(0).summary(total_count),shares.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights{values,name}&limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
+        videos = requests.get(url).json()
+        if 'error' in videos:
+            log_error(videos,'error_log.json')
+            if videos['error']['code'] == 1:
+               print(str(limit) + ' is too high')
+               limit = str(int(limit) - 5) # try again with a smaller request
+            elif videos['error']['code'] == 190:
+               print('bad access_token! see error log for details')
+               break
+            else:
+               print('API error code ' + str(videos['error']['code']))
+               break
+        else:
+            too_many_videos_at_a_time = False
+
+    videos_dict = {}
+
+    pagination = True
+
+    while pagination:
+        for video in videos['data']:
+            title = video.get('title', '').replace('\n', ' ').replace(',', ' ')
+            description = video.get('description', '').replace('\n', ' ').replace(',', ' ').replace('"','')
+            created_time = video['created_time'].replace('T', ' ').replace('+0000', '')
+            length = video['length']
+            likes = 0
+            comments = 0
+            reactions = 0
+            if 'likes' in video:
+                try:
+                    likes = video['likes']['summary']['total_count']
+                except KeyError:
+                    log_error(video,'error_log.json')
+            if 'comments' in video:
+                try:
+                    comments = video['comments']['summary']['total_count']
+                except KeyError:
+                    log_error(video,'error_log.json')
+            if 'reactions' in video:
+                try:
+                    reactions = video['reactions']['summary']['total_count']
+                except KeyError:
+                    log_error(video,'error_log.json')
+            
+            insights = {}
+            no_insights = False
+            try:
+                insights_data = video['video_insights']['data']
+            except KeyError:
+                no_insights = True
+            for insight in insights_data:
+                insights[insight['name']] = insight['values'][0]['value']
+            if no_insights:
+                videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions]
+            else:
+                try:
+                    shares = insights['total_video_stories_by_action_type']['share']
+                except KeyError:
+                    shares = 0
+                avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
+                videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], avg_completion]
+        try: 
+            videos = requests.get(videos['paging']['next']).json()
+        except KeyError:
+            pagination = False
+        # end while
+
+    return videos_dict
