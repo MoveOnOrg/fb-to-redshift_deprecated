@@ -37,11 +37,13 @@ Note: This uses Python3.
     * Click the "Debug" button to the right. "Expires" should show "Never"
     * Paste this token into settings.py as the value for `fb_long_token` 
     
-  * You will also need to have [created a Redshift database](http://docs.aws.amazon.com/redshift/latest/dg/t_creating_database.html), and have your [AWS IAM credentials](https://aws.amazon.com/iam/). Make sure to create tables in the schema `facebook`, named `posts` and `videos`
+  * You will also need to have [created a Redshift database](http://docs.aws.amazon.com/redshift/latest/dg/t_creating_database.html), and have your [AWS IAM credentials](https://aws.amazon.com/iam/). Make sure to create tables in the schema `facebook`, named `posts` and `videos` and `video_lab_videos`.
     
     `CREATE TABLE facebook.posts(post_id VARCHAR(256) PRIMARY KEY, message VARCHAR(max), created_time timestamp, likes INT, shares INT, comments INT, total_reach INT);`
 
     `CREATE TABLE facebook.videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, minutes_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_completion DECIMAL(4,3) NULL);`
+
+    `CREATE TABLE facebook.video_lab_videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, minutes_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_completion DECIMAL(4,3) NULL);`
 
   * You'll also need to have [created a bucket in s3](http://docs.aws.amazon.com/gettingstarted/latest/swh/getting-started-create-bucket.html).
 
@@ -51,4 +53,4 @@ Note: This uses Python3.
   
   `python fb_to_redshift.py`
 
-  * You can limit the timeframe from which a run of the script grabs posts by passing an argument (e.g. 'year', 'month', 'week') to the call to create_import_file() at the bottom of `fb_to_redshift.py`.
+  * You can limit the timeframe from which a run of the script grabs posts by passing an argument (e.g. 'year', 'month', 'week') to the calls to create_import_file() at the bottom of `fb_to_redshift.py`.

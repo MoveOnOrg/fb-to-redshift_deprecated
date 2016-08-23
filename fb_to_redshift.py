@@ -14,6 +14,9 @@ def create_import_file(interval=False, import_type='posts'):
     if import_type == 'videos':
         import_file = open('fb_import_videos.csv', 'w')
         data_dict = get_video_stats(interval)
+    if import_type == 'video_lab':
+        import_file = open('fb_import_video_lab.csv', 'w')
+        data_dict = get_video_stats(interval,True)
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     csv_file.writerows([[id,]+values for id, values in data_dict.items()])
     import_file.close()
@@ -86,9 +89,43 @@ END;"""%(s3_bucket, aws_access_key, aws_secret_key)
 
     rsm.db_query(command)
 
+def update_redshift_video_lab_videos():
+    command = """-- Create a staging table 
+CREATE TABLE facebook.video_lab_staging (LIKE facebook.video_lab_videos);
+
+-- Load data into the staging table 
+COPY facebook.video_lab_staging (video_id, title, description, created_time, video_length, likes, comments, reactions, shares, reach, ms_viewed, total_views, unique_viewers, views_10sec, views_30sec, views_95pct, avg_completion) 
+FROM 's3://%s/fb_import_videos.csv' 
+CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
+FILLRECORD
+delimiter ','; 
+
+-- Update records 
+UPDATE facebook.video_lab_videos 
+SET title = s.title, description = s.description, created_time = s.created_time, video_length = s.video_length, likes = s.likes, comments = s.comments, reactions = s.reactions, shares = s.shares, reach = s.reach, ms_viewed = s.ms_viewed, total_views = s.total_views, unique_viewers = s.unique_viewers, views_10sec = s.views_10sec, views_30sec = s.views_30sec, views_95pct = s.views_95pct, avg_completion = s.avg_completion
+FROM facebook.video_lab_staging s
+WHERE facebook.video_lab_videos.video_id = s.video_id; 
+
+-- Insert records 
+INSERT INTO facebook.video_lab_videos 
+SELECT s.* FROM facebook.video_lab_staging s LEFT JOIN facebook.video_lab_videos 
+ON s.video_id = facebook.video_lab_videos.video_id
+WHERE facebook.video_lab_videos.video_id IS NULL;
+
+-- Drop the staging table
+DROP TABLE facebook.video_lab_staging; 
+
+-- End transaction 
+END;"""%(s3_bucket, aws_access_key, aws_secret_key)
+
+    rsm.db_query(command)
+
 create_import_file('month', 'posts')
 create_import_file(False, 'videos')
+create_import_file(False, 'video_lab')
 upload_to_s3('fb_import_posts.csv')
 upload_to_s3('fb_import_videos.csv')
+upload_to_s3('fb_import_video_lab.csv')
 update_redshift_posts()
 update_redshift_videos()
+update_redshift_video_lab_videos()

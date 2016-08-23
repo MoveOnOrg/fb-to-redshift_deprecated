@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from settings import fb_version, fb_page_id, fb_long_token, post_limit
+from settings import fb_version, fb_page_id, fb_long_token, post_limit, fb_videolab_list_id
 import requests
 import json
 import sys
@@ -100,9 +100,9 @@ def get_total_reach(posts_dict):
         posts_dict[post_id].append(total_reach)
     return posts_dict
 
-# this results in videos_dict = {video_id: [title, description, created_time, length, likes, comments, reactions, total_video_view_total_time, total_video_views_unique, total_video_10s_views_unique, total_video_30s_views_unique, avg_completion, total_video_impressions_unique, shares]}
+# this results in videos_dict = {video_id: [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views'],insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], insights['total_video_complete_views'], avg_completion]}
 
-def get_video_stats(interval = False):
+def get_video_stats(interval = False, video_lab = False):
     now = int(time.time())
     if interval == 'week':
         since = str(now - 604800)
@@ -116,10 +116,18 @@ def get_video_stats(interval = False):
     too_many_videos_at_a_time = True
 
     while too_many_videos_at_a_time:
-        if interval:
-            url = base_url + '%s/videos?fields=title,description,created_time,length,comments.limit(0).summary(total_count),likes.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights{values,name}&limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id, limit, since, now, fb_long_token)
+
+        if video_lab:
+            if interval:
+                url = base_url + '%s/?fields=videos{title,description,created_time,length,likes.limit(0).summary(total_count),comments.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights}&limit=%s&since=%s&until=%s&access_token=%s' %(fb_videolab_list_id, limit, since, now, fb_long_token)
+            else:
+                url = base_url + '%s/?fields=videos{title,description,created_time,length,likes.limit(0).summary(total_count),comments.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights}&limit=%s&access_token=%s' %(fb_videolab_list_id, limit, fb_long_token)
         else:
-            url = base_url + '%s/videos?fields=title,description,created_time,length,comments.limit(0).summary(total_count),likes.limit(0).summary(total_count),shares.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights{values,name}&limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
+            if interval:
+                url = base_url + '%s/videos?fields=title,description,created_time,length,comments.limit(0).summary(total_count),likes.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights{values,name}&limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id, limit, since, now, fb_long_token)
+            else:
+                url = base_url + '%s/videos?fields=title,description,created_time,length,comments.limit(0).summary(total_count),likes.limit(0).summary(total_count),shares.limit(0).summary(total_count),reactions.limit(0).summary(total_count),video_insights{values,name}&limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
+
         videos = requests.get(url).json()
         if 'error' in videos:
             log_error(videos,'error_log.json')
@@ -138,6 +146,9 @@ def get_video_stats(interval = False):
     videos_dict = {}
 
     pagination = True
+
+    if video_lab:
+        videos = videos['videos']
 
     while pagination:
         for video in videos['data']:
