@@ -95,7 +95,7 @@ CREATE TABLE facebook.video_lab_staging (LIKE facebook.video_lab_videos);
 
 -- Load data into the staging table 
 COPY facebook.video_lab_staging (video_id, title, description, created_time, video_length, likes, comments, reactions, shares, reach, ms_viewed, total_views, unique_viewers, views_10sec, views_30sec, views_95pct, avg_completion) 
-FROM 's3://%s/fb_import_videos.csv' 
+FROM 's3://%s/fb_import_video_lab.csv' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 FILLRECORD
 delimiter ','; 
