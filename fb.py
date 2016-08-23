@@ -180,7 +180,7 @@ def get_video_stats(interval = False):
                 except KeyError:
                     shares = 0
                 avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
-                videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], avg_completion]
+                videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views'],insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], insights['total_video_complete_views'], avg_completion]
         try: 
             videos = requests.get(videos['paging']['next']).json()
         except KeyError:

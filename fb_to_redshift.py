@@ -60,7 +60,7 @@ def update_redshift_videos():
 CREATE TABLE facebook.videos_staging (LIKE facebook.videos);
 
 -- Load data into the staging table 
-COPY facebook.videos_staging (video_id, title, description, created_time, video_length, likes, comments, reactions, shares, reach, minutes_viewed, unique_viewers, views_10sec, views_30sec, avg_completion) 
+COPY facebook.videos_staging (video_id, title, description, created_time, video_length, likes, comments, reactions, shares, reach, minutes_viewed, total_views, unique_viewers, views_10sec, views_30sec, views_95pct, avg_completion) 
 FROM 's3://%s/fb_import_videos.csv' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 FILLRECORD
@@ -68,7 +68,7 @@ delimiter ',';
 
 -- Update records 
 UPDATE facebook.videos 
-SET title = s.title, description = s.description, created_time = s.created_time, video_length = s.video_length, likes = s.likes, comments = s.comments, reactions = s.reactions, shares = s.shares, reach = s.reach, minutes_viewed = s.minutes_viewed, unique_viewers = s.unique_viewers, views_10sec = s.views_10sec, views_30sec = s.views_30sec, avg_completion = s.avg_completion
+SET title = s.title, description = s.description, created_time = s.created_time, video_length = s.video_length, likes = s.likes, comments = s.comments, reactions = s.reactions, shares = s.shares, reach = s.reach, minutes_viewed = s.minutes_viewed, total_views = s.total_views, unique_viewers = s.unique_viewers, views_10sec = s.views_10sec, views_30sec = s.views_30sec, views_95pct = s.views_95pct, avg_completion = s.avg_completion
 FROM facebook.videos_staging s
 WHERE facebook.videos.video_id = s.video_id; 
 
