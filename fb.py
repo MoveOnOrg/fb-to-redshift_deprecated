@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from settings import fb_version, fb_page_id, fb_long_token, post_limit
+from settings import fb_version, fb_page_id, fb_long_token, post_limit, time_series_start_date
 import requests
 import json
 import sys
 import time
-import datetime
+from datetime import datetime
 
 base_url = "https://graph.facebook.com/%s/" %fb_version
 
@@ -192,6 +192,61 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     shares = 0
                 avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
                 videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views'],insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], insights['total_video_complete_views'], avg_completion]
+        try: 
+            videos = requests.get(videos['paging']['next']).json()
+        except KeyError:
+            pagination = False
+        # end while
+
+    return videos_dict
+
+def get_video_time_series(start_date = time_series_start_date):
+    
+    since = int(datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S').timestamp())
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    too_many_videos_at_a_time = True
+
+    limit = post_limit
+
+    while too_many_videos_at_a_time:
+        url = base_url + '%s/videos?fields=title,created_time,video_insights{values,name}&limit=%s&since=%s&access_token=%s' %(fb_page_id, limit, since, fb_long_token)
+
+        videos = requests.get(url).json()
+        if 'error' in videos:
+            log_error(videos,'error_log.json')
+            if videos['error']['code'] == 1:
+               print(str(limit) + ' is too high')
+               limit = str(int(limit) - 5) # try again with a smaller request
+            elif videos['error']['code'] == 190:
+               print('bad access_token! see error log for details')
+               break
+            else:
+               print('API error code ' + str(videos['error']['code']))
+               break
+        else:
+            too_many_videos_at_a_time = False
+
+    videos_dict = {}
+
+    pagination = True
+
+    while pagination:
+        for video in videos['data']:
+            title = video.get('title', '').replace('\n', ' ').replace(',', ' ')
+            created_time = video['created_time'].replace('T', ' ').replace('+0000', '')            
+            insights = {}
+            no_insights = False
+            try:
+                insights_data = video['video_insights']['data']
+            except KeyError:
+                no_insights = True
+            for insight in insights_data:
+                insights[insight['name']] = insight['values'][0]['value']
+            if no_insights:
+                videos_dict[video['id']] = [title, created_time, now]
+            else:
+                videos_dict[video['id']] = [title, created_time, now, insights['total_video_views'],insights['total_video_views_unique'], insights['total_video_10s_views_unique']]
         try: 
             videos = requests.get(videos['paging']['next']).json()
         except KeyError:
