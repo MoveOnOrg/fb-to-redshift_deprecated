@@ -11,7 +11,6 @@ fb_version = 'v2.7'
 fb_page_id = ''
 fb_long_token = ''
 post_limit = '100'
-fb_videolab_list_id = ''
 
 # AWS settings
 aws_access_key = ''
