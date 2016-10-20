@@ -1,5 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+""" Runs all the things. Most of the functions that do the work live elsewhere. 
+"""
+
 from fb_tools import create_import_file, upload_to_s3, update_redshift
 
 def main():

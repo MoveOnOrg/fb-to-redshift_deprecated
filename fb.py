@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+""" All the functions that work with the Graph API to get data.
+"""
+
 from settings import fb_version, fb_page_id, fb_long_token, post_limit, time_series_start_date
 import requests
 import json

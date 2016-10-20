@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+""" Get tokens that allow us to get page data from Graph API.
+    See README.md for how to get an immortal token.
+"""
+
 from settings import fb_version, fb_page_id, fb_long_token, user_access_token, client_id, client_secret
 import requests
 
