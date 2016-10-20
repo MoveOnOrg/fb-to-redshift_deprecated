@@ -87,7 +87,7 @@ video_lab_videos['interval'] = False
 video_lab_videos['import_type'] = 'video_lab_videos'
 video_lab_videos['filename'] = 'fb_import_video_lab.csv'
 video_lab_videos['tablename'] = 'facebook.video_lab_videos'
-video_lab_videos['columns'] = ['video_id', 'title', 'description', 'created_time', 'video_length', 'likes', 'comments', 'reactions', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers', 'views_10sec', 'views_30sec', 'views_95pct', 'avg_completion']
+video_lab_videos['columns'] = ['video_id', 'title', 'description', 'created_time', 'video_length', 'likes', 'comments', 'reactions', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers', 'views_10sec', 'views_30sec', 'views_95pct', 'avg_sec_watched','avg_completion']
 video_lab_videos['primary_key'] = 'video_id'
 video_lab_videos['list_id'] = '1563848167245359'
 
@@ -96,7 +96,7 @@ video_lab_videos_2['interval'] = False
 video_lab_videos_2['import_type'] = 'video_lab_videos'
 video_lab_videos_2['filename'] = 'fb_import_video_lab_2.csv'
 video_lab_videos_2['tablename'] = 'facebook.video_lab_videos'
-video_lab_videos_2['columns'] = ['video_id', 'title', 'description', 'created_time', 'video_length', 'likes', 'comments', 'reactions', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers', 'views_10sec', 'views_30sec', 'views_95pct', 'avg_completion']
+video_lab_videos_2['columns'] = ['video_id', 'title', 'description', 'created_time', 'video_length', 'likes', 'comments', 'reactions', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers', 'views_10sec', 'views_30sec', 'views_95pct', 'avg_sec_watched', 'avg_completion']
 video_lab_videos_2['primary_key'] = 'video_id'
 video_lab_videos_2['list_id'] = '1225720367451359'
 
