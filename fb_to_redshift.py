@@ -5,6 +5,7 @@
 """
 
 from fb_tools import create_import_file, upload_to_s3, update_redshift
+from time import gmtime, strftime
 
 def main():
     posts = {}
@@ -42,7 +43,9 @@ def main():
     video_lab_videos_2['list_id'] = '1225720367451359'
 
     data_types = [posts, videos, video_lab_videos, video_lab_videos_2]
-
+    
+    print()
+    print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     for item in data_types:
         if 'list_id' in item:
             create_import_file(item.get('interval'), item.get('import_type'), item.get('filename'), item.get('list_id'))
