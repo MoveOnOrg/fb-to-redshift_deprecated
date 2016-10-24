@@ -79,7 +79,7 @@ videos['interval'] = False
 videos['import_type'] = 'videos'
 videos['filename'] = 'fb_import_videos.csv'
 videos['tablename'] = 'facebook.videos'
-videos['columns'] = ['video_id', 'title', 'description', 'created_time', 'video_length', 'likes', 'comments', 'reactions', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers', 'views_10sec', 'views_30sec', 'views_95pct', 'avg_completion']
+videos['columns'] = ['video_id', 'title', 'description', 'created_time', 'video_length', 'likes', 'comments', 'reactions', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers', 'views_10sec', 'views_30sec', 'views_95pct', 'avg_sec_watched', 'avg_completion']
 videos['primary_key'] = 'video_id'
 
 video_lab_videos = {}
