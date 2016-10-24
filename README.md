@@ -43,9 +43,9 @@ Note: This uses Python3.
     
     `CREATE TABLE facebook.posts(post_id VARCHAR(256) PRIMARY KEY, message VARCHAR(max), created_time timestamp, likes INT, shares INT, comments INT, total_reach INT);`
 
-    `CREATE TABLE facebook.videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, ms_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_completion DECIMAL(4,3) NULL);`
+    `CREATE TABLE facebook.videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, ms_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_sec_watched DECIMAL (6,2), avg_completion DECIMAL(4,3) NULL);`
 
-    `CREATE TABLE facebook.video_lab_videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, ms_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_completion DECIMAL(4,3) NULL);`
+    `CREATE TABLE facebook.video_lab_videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, ms_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_sec_watched DECIMAL (6,2), avg_completion DECIMAL(4,3) NULL);`
 
   * You'll also need to have [created a bucket in s3](http://docs.aws.amazon.com/gettingstarted/latest/swh/getting-started-create-bucket.html).
 
