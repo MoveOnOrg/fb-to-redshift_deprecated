@@ -7,7 +7,7 @@ from settings import fb_version, fb_page_id, fb_long_token, post_limit, time_ser
 import requests
 import json
 import sys
-import time
+from time import gmtime, strftime, time
 from datetime import datetime
 
 base_url = "https://graph.facebook.com/%s/" %fb_version
@@ -15,7 +15,7 @@ base_url = "https://graph.facebook.com/%s/" %fb_version
 
 def log_error(content,logfile):
     error_log = open(logfile,'a')
-    error_log.write(datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
+    error_log.write(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     json.dump(content, error_log, indent=4)
     error_log.close()
 
@@ -24,7 +24,7 @@ def log_error(content,logfile):
 
 def get_posts_and_interactions(interval=False):
     
-    now = int(time.time())
+    now = int(time())
     if interval == 'week':
         since = str(now - 604800)
     if interval == 'month':
@@ -207,7 +207,7 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
 def get_video_time_series(start_date = time_series_start_date):
     
     since = int(datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S').timestamp())
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
     too_many_videos_at_a_time = True
 
