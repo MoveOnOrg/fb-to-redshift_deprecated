@@ -47,6 +47,8 @@ Note: This uses Python3.
 
     `CREATE TABLE facebook.video_lab_videos(video_id VARCHAR(256) PRIMARY KEY, title VARCHAR(max), description VARCHAR(max), created_time timestamp, video_length DECIMAL (6,2), likes INT, comments INT, reactions INT, shares INT NULL, reach BIGINT NULL, ms_viewed BIGINT NULL, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, views_30sec INT NULL, views_95pct INT NULL, avg_sec_watched DECIMAL (6,2), avg_completion DECIMAL(4,3) NULL);`
 
+    `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, primary key (video_id, snapshot_time));`
+
   * You'll also need to have [created a bucket in s3](http://docs.aws.amazon.com/gettingstarted/latest/swh/getting-started-create-bucket.html).
 
   * Note: the connection to S3 uses the boto library which has [excellent docs](https://boto3.readthedocs.io/en/latest/guide/migrations3.html#creating-the-connection).
@@ -56,3 +58,5 @@ Note: This uses Python3.
   `python fb_to_redshift.py`
 
   * You can limit the timeframe from which a run of the script grabs posts by passing an argument (e.g. 'year', 'month', 'week') to the calls to create_import_file() at the bottom of `fb_to_redshift.py`.
+
+6. Optional: Run the time series script `python fb_video_time_series.py`
