@@ -106,7 +106,7 @@ def get_total_reach(posts_dict):
 # this results in videos_dict = {video_id: [title, description, created_time, length, likes, comments, reactions, shares, insights['total_video_impressions_unique'], insights['total_video_view_total_time'], insights['total_video_views'],insights['total_video_views_unique'], insights['total_video_10s_views_unique'], insights['total_video_30s_views_unique'], insights['total_video_complete_views'], avg_completion]}
 
 def get_video_stats(interval = False, video_lab = False, list_id = None):
-    now = int(time.time())
+    now = int(time())
     if interval == 'week':
         since = str(now - 604800)
     if interval == 'month':
