@@ -59,5 +59,5 @@ def main():
         update_redshift(item.get('tablename'), item.get('columns'), item.get('primary_key'), item.get('filename'))
         print("updated redshift table " + item.get('tablename'))
 
-if __name__='__main__':
+if __name__=='__main__':
    main()
