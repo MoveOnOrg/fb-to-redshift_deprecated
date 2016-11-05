@@ -110,16 +110,15 @@ def get_total_reach(posts_dict):
                 fb_long_token)
             )
         total_reach_values = requests.get(url).json()
-        print(total_reach_values)
         total_reach = 0
         try:
             if (len(total_reach_values['data']) > 0 and
                 'values' in total_reach_values['data'][0]):
                 total_reach = total_reach_values['data'][0]['values'][0]['value']
+                posts_dict[post_id].append(total_reach)
+                return posts_dict
         except KeyError:
-            print("total reach key error")
-        posts_dict[post_id].append(total_reach)
-    return posts_dict
+            print("total reach key error", total_reach_values)    
 
 # this results in videos_dict = {video_id: [title, description, created_time, length, 
 # likes, comments, reactions, shares, insights['total_video_impressions_unique'], 

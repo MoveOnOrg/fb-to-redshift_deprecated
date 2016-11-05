@@ -13,7 +13,10 @@ def main():
     posts['import_type'] = 'posts'
     posts['filename'] = 'fb_import_posts.csv'
     posts['tablename'] = 'facebook.posts'
-    posts['columns'] = ['post_id', 'message', 'created_time', 'likes', 'shares', 'comments', 'total_reach']
+    posts['columns'] = [
+        'post_id', 'message', 'created_time', 'likes',
+    'shares','comments', 'total_reach'
+    ]
     posts['primary_key'] = 'post_id'
 
     videos = {}
