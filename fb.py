@@ -97,9 +97,13 @@ def get_total_reach(posts_dict):
     for post_id in posts_dict.keys():
         url = base_url + "%s/insights/post_impressions?period=lifetime&access_token=%s" %(post_id, fb_long_token)
         total_reach_values = requests.get(url).json()
+        print(total_reach_values)
         total_reach = 0
-        if len(total_reach_values['data']) > 0 and 'values' in total_reach_values['data'][0]:
-            total_reach = total_reach_values['data'][0]['values'][0]['value']
+        try:
+            if len(total_reach_values['data']) > 0 and 'values' in total_reach_values['data'][0]:
+                total_reach = total_reach_values['data'][0]['values'][0]['value']
+        except KeyError:
+            print("total reach key error")
         posts_dict[post_id].append(total_reach)
     return posts_dict
 
