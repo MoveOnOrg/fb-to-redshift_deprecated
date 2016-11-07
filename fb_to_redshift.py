@@ -6,7 +6,7 @@
 
 from fb_tools import create_import_file, upload_to_s3, update_redshift
 from time import gmtime, strftime
-from settings import test
+from settings import test, files_dir, s3_bucket, s3_bucket_dir
 
 def main():
     posts = {}
@@ -112,10 +112,10 @@ def main():
             create_import_file(item.get('interval'), item.get('import_type'),
                 item.get('filename')
                 )
-        print("created " + item.get('filename')) 
+        print("created %s " %(files_dir + item.get('filename')) 
         
         upload_to_s3(item.get('filename'))
-        print("uploaded " + item.get('filename') + " to s3")
+        print("uploaded %s to s3 bucket s3://%s" %(files_dir + item.get('filename'), s3_bucket + '/' + s3_bucket_dir)
         
         update_redshift(item.get('tablename'), item.get('columns'), 
             item.get('primary_key'), item.get('filename'))

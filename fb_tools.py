@@ -5,7 +5,7 @@
 
 from redshift import rsm
 from fb import get_posts_and_interactions, get_video_stats, get_video_time_series
-from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir
+from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir, s3_bucket_dir
 import boto
 import csv
 
@@ -26,9 +26,9 @@ def create_import_file(interval=False, import_type='posts', filename='fb_import_
 def upload_to_s3(filename='fb_import_posts.csv'):
     conn = boto.connect_s3(aws_access_key, aws_secret_key)
     bucket = conn.lookup(s3_bucket)
-    k = boto.s3.key.Key(bucket) 
-    k.key = filename
-    k.set_contents_from_filename(filename)
+    k = boto.s3.key.Key(bucket)
+    k.key = '/' + s3_bucket_dir + filename
+    k.set_contents_from_filename(files_dir + filename)
 
 def update_redshift(table_name, columns, primary_key, filename):
     staging_table_name = table_name + "_staging"
@@ -63,7 +63,7 @@ WHERE %s IS NULL;
 DROP TABLE %s; 
 
 -- End transaction 
-END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
+END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, s3_bucket_dir + filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
     # if test:
     #     print("Query: %s" %command)
     # else:
