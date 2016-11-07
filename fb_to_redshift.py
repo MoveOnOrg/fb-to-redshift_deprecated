@@ -198,8 +198,8 @@ def main():
         'region_42_name', 'region_42_views', 'region_43_name', 'region_43_views',
         'region_44_name', 'region_44_views', 'region_45_name', 'region_45_views'
         ]
-    video_lab_demographics2['primary_key'] = 'video_id'
-    video_lab_demographics2['list_id'] = '1563848167245359'
+    video_lab_demographics_2['primary_key'] = 'video_id'
+    video_lab_demographics_2['list_id'] = '1563848167245359'
 
     data_types = [posts, videos, video_lab_videos, video_lab_videos_2,
         video_demographics, video_lab_demographics, video_lab_demographics_2
