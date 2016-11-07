@@ -373,7 +373,7 @@ def get_video_time_series(start_date = time_series_start_date):
 
     return videos_dict
 
-def get_video_view_demographics(interval = False, video_lab = False, list_id = None):
+def get_video_views_demographics(interval = False, video_lab = False, list_id = None):
     now = int(time())
     if interval == 'week':
         since = str(now - 604800)

@@ -4,7 +4,7 @@
 """
 
 from redshift import rsm
-from fb import get_posts_and_interactions, get_video_stats, get_video_time_series
+from fb import get_posts_and_interactions, get_video_stats, get_video_time_series, get_video_views_demographics
 from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir, s3_bucket_dir
 import boto
 import csv
@@ -19,6 +19,10 @@ def create_import_file(interval=False, import_type='posts', filename='fb_import_
         data_dict = get_video_stats(interval, True, list_id)
     if import_type == 'time_series':
         data_dict = get_video_time_series()
+    if import_type == 'views_demographics':
+        data_dict = get_video_views_demographics(interval)
+    if import_type == 'views_demographics_video_lab':
+        data_dict = get_video_views_demographics(interval, True, list_id)
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     csv_file.writerows([[id,]+values for id, values in data_dict.items()])
     import_file.close()
