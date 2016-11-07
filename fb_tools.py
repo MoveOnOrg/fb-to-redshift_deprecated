@@ -64,7 +64,9 @@ DROP TABLE %s;
 
 -- End transaction 
 END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
-    if test:
-        print("Query: %s" %command)
-    else:
-        rsm.db_query(command)
+    # if test:
+    #     print("Query: %s" %command)
+    # else:
+    #     rsm.db_query(command)
+    rsm.db_query(command)
+
