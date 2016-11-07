@@ -4,15 +4,15 @@
 """
 
 from redshift import rsm
-from fb import get_posts_and_interactions, get_total_reach, get_video_stats, get_video_time_series
-from settings import aws_access_key, aws_secret_key, s3_bucket
+from fb import get_posts_and_interactions, get_video_stats, get_video_time_series
+from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir
 import boto
 import csv
 
 def create_import_file(interval=False, import_type='posts', filename='fb_import_posts.csv', list_id = None):
-    import_file = open(filename, 'w')
+    import_file = open(files_dir + filename, 'w')
     if import_type == 'posts':
-        data_dict = get_total_reach(get_posts_and_interactions(interval))
+        data_dict = get_posts_and_interactions(interval)
     if import_type == 'videos':
         data_dict = get_video_stats(interval)
     if import_type == 'video_lab_videos':
@@ -64,5 +64,7 @@ DROP TABLE %s;
 
 -- End transaction 
 END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
-
-    rsm.db_query(command)
+    if test:
+        print("Query: %s" %command)
+    else:
+        rsm.db_query(command)

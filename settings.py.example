@@ -21,3 +21,9 @@ s3_bucket = ''
 user_access_token = ''
 client_id = ''
 client_secret = ''
+
+# toggle test mode on and off
+test = False
+
+# download files to a specific directory
+files_dir = ''
