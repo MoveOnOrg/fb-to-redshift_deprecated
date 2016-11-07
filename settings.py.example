@@ -16,8 +16,16 @@ post_limit = '100'
 aws_access_key = ''
 aws_secret_key = ''
 s3_bucket = ''
+s3_bucket_dir = 'fb_data/'
+
 
 # Facebook user access settings
 user_access_token = ''
 client_id = ''
 client_secret = ''
+
+# toggle test mode on and off
+test = False
+
+# download files to a specific directory
+files_dir = ''

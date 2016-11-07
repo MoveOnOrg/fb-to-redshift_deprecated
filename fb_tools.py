@@ -4,21 +4,25 @@
 """
 
 from redshift import rsm
-from fb import get_posts_and_interactions, get_total_reach, get_video_stats, get_video_time_series
-from settings import aws_access_key, aws_secret_key, s3_bucket
+from fb import get_posts_and_interactions, get_video_stats, get_video_time_series, get_video_views_demographics
+from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir, s3_bucket_dir
 import boto
 import csv
 
 def create_import_file(interval=False, import_type='posts', filename='fb_import_posts.csv', list_id = None):
-    import_file = open(filename, 'w')
+    import_file = open(files_dir + filename, 'w')
     if import_type == 'posts':
-        data_dict = get_total_reach(get_posts_and_interactions(interval))
+        data_dict = get_posts_and_interactions(interval)
     if import_type == 'videos':
         data_dict = get_video_stats(interval)
     if import_type == 'video_lab_videos':
         data_dict = get_video_stats(interval, True, list_id)
     if import_type == 'time_series':
         data_dict = get_video_time_series()
+    if import_type == 'views_demographics':
+        data_dict = get_video_views_demographics(interval)
+    if import_type == 'views_demographics_video_lab':
+        data_dict = get_video_views_demographics(interval, True, list_id)
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     csv_file.writerows([[id,]+values for id, values in data_dict.items()])
     import_file.close()
@@ -26,9 +30,9 @@ def create_import_file(interval=False, import_type='posts', filename='fb_import_
 def upload_to_s3(filename='fb_import_posts.csv'):
     conn = boto.connect_s3(aws_access_key, aws_secret_key)
     bucket = conn.lookup(s3_bucket)
-    k = boto.s3.key.Key(bucket) 
-    k.key = filename
-    k.set_contents_from_filename(filename)
+    k = boto.s3.key.Key(bucket)
+    k.key = '/' + s3_bucket_dir + filename
+    k.set_contents_from_filename(files_dir + filename)
 
 def update_redshift(table_name, columns, primary_key, filename):
     staging_table_name = table_name + "_staging"
@@ -63,6 +67,9 @@ WHERE %s IS NULL;
 DROP TABLE %s; 
 
 -- End transaction 
-END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
+END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, s3_bucket_dir + filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
+    if test:
+        print("Query: %s" %command)
+    else:
+        rsm.db_query(command)
 
-    rsm.db_query(command)
