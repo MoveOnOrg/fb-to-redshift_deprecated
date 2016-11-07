@@ -43,7 +43,8 @@ def get_posts_and_interactions(interval=False):
                 likes.limit(0).summary(total_count),\
                 comments.limit(0).summary(total_count),\
                 shares,\
-                insights.metric(post_impressions){values,name}\
+                insights.metric(post_impressions,\
+                post_consumptions_by_type){values,name}\
                 &limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id,
                     limit, since, now, fb_long_token)
                 )
@@ -53,7 +54,7 @@ def get_posts_and_interactions(interval=False):
                 likes.limit(0).summary(true),\
                 comments.limit(0).summary(true),\
                 shares,\
-                insights.metric(post_impressions){values,name}\
+                insights.metric(post_impressions,post_consumptions_by_type){values,name}\
                 &limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
                 )
         
@@ -115,19 +116,17 @@ def get_posts_and_interactions(interval=False):
                     comments
                     ]
             else:
-                try:
-                    impressions = insights['post_impressions']
-                except KeyError:
-                    impressions = 0
-                finally:
-                    posts_dict[post['id']] = [
-                        message,
-                        created_time,
-                        likes,
-                        shares,
-                        comments,
-                        impressions
-                        ]
+                impressions = insights.get('post_impressions', 0)
+                link_clicks = insights['post_consumptions_by_type'].get('link clicks', 0)
+                posts_dict[post['id']] = [
+                    message,
+                    created_time,
+                    likes,
+                    shares,
+                    comments,
+                    impressions,
+                    link_clicks
+                    ]
             
         if 'paging' in posts:
             posts = requests.get(posts['paging']['next']).json()

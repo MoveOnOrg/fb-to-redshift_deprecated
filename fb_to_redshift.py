@@ -16,7 +16,7 @@ def main():
     posts['tablename'] = 'facebook.posts'
     posts['columns'] = [
         'post_id', 'message', 'created_time', 'likes',
-        'shares','comments', 'total_reach'
+        'shares','comments', 'total_reach', 'link_clicks'
         ]
     posts['primary_key'] = 'post_id'
 
