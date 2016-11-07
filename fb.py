@@ -372,3 +372,113 @@ def get_video_time_series(start_date = time_series_start_date):
         # end while
 
     return videos_dict
+
+def get_video_view_demographics(interval = False, video_lab = False, list_id = None):
+    now = int(time())
+    if interval == 'week':
+        since = str(now - 604800)
+    if interval == 'month':
+        since = str(now - 2592000)
+    if interval == 'year':
+        since = str(now - 31536000)
+    now = str(now)
+
+    limit = post_limit
+    too_many_videos_at_a_time = True
+
+    while too_many_videos_at_a_time:
+
+        if video_lab:
+            if interval:
+                url = (base_url +
+                    '%s/?fields=videos{video_insights.metric(total_video_view_time_by_region_id,\
+                    total_video_view_time_by_age_bucket_and_gender)}\
+                    &limit=%s&since=%s&until=%s&access_token=%s' %(list_id,
+                        limit, since, now, fb_long_token)
+                    )
+            else:
+                url = (base_url +
+                    '%s/?fields=videos{video_insights.metric(total_video_view_time_by_region_id,\
+                    total_video_view_time_by_age_bucket_and_gender)}\
+                    &limit=%s&access_token=%s' %(list_id, limit, fb_long_token)
+                    )
+        else:
+            if interval:
+                url = (base_url + 
+                    '%s/videos?fields=video_insights.metric(total_video_view_time_by_region_id,\
+                    total_video_view_time_by_age_bucket_and_gender){values,name}\
+                    &limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id,
+                        limit, since, now, fb_long_token)
+                    )
+            else:
+                url = (base_url +
+                    '%s/videos?fields=video_insights.metric(total_video_view_time_by_region_id,\
+                    total_video_view_time_by_age_bucket_and_gender){values,name}\
+                    &limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
+                    )
+
+        videos = requests.get(url).json()
+        if 'error' in videos:
+            log_error(videos,'error_log.json')
+            if videos['error']['code'] == 1:
+               print(str(limit) + ' is too high')
+               limit = str(int(limit) - 5) # try again with a smaller request
+            elif videos['error']['code'] == 190:
+               print('bad access_token! see error log for details')
+               break
+            else:
+               print('API error code ' + str(videos['error']['code']))
+               break
+        else:
+            too_many_videos_at_a_time = False
+
+    videos_dict = {}
+
+    pagination = True
+
+    if video_lab:
+        videos = videos['videos']
+
+    while pagination:
+        for video in videos['data']:
+            insights = {}
+            no_insights = False
+            try:
+                insights_data = video['video_insights']['data']
+            except KeyError:
+                no_insights = True
+            for insight in insights_data:
+                insights[insight['name']] = insight['values'][0]['value']
+            if no_insights:
+                videos_dict[video['id']] = []
+            else:
+                try:
+                    regions = insights['total_video_view_time_by_region_id']
+                    regions_data = [] # 45 regions
+                    for key,value in regions.items():
+                        regions_data.append(key)
+                        regions_data.append(value)
+                except KeyError:
+                    regions_data = ['' for x in range(45)]
+                    print("no regions views data for video %s" %video['id'])
+                try:
+                    age_gender_dict = insights['total_video_view_time_by_age_bucket_and_gender']
+                    age_gender_buckets = ['U.13-17','U.18-24','U.25-34','U.35-44',
+                        'U.45-54','U.55-64','U.65+','F.13-17','F.18-24','F.25-34',
+                        'F.35-44','F.45-54','F.55-64','F.65+','M.13-17','M.18-24',
+                        'M.25-34','M.35-44','M.45-54','M.55-64','M.65+'
+                        ]
+                    age_gender_data = [age_gender_dict[x] for x in age_gender_buckets]
+                except KeyError:
+                    age_gender_data = ['' for x in range(21)]
+                    print("no age or gender data for video %s" %video['id'])
+                videos_dict[video['id']] = age_gender_data + regions_data
+
+        try: 
+            videos = requests.get(videos['paging']['next']).json()
+        except KeyError:
+            pagination = False
+        # end while
+
+    print("Retrieved demographic data for %s videos" %str(len(videos_dict)))
+    return videos_dict
