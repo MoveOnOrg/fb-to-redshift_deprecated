@@ -81,33 +81,13 @@ def get_posts_and_interactions(interval=False):
         for post in posts['data']:
             message = post.get('message', '').replace('\n', ' ').replace(',', ' ')
             created_time = post['created_time'].replace('T', ' ').replace('+0000', '')
-            likes = 0
-            shares = 0
-            comments = 0
-            if 'likes' in post:
-                try:
-                    likes = post['likes']['summary']['total_count']
-                except KeyError:
-                    log_error(post,'error_log.json')
-            if 'shares' in post:
-                try:
-                    shares = post['shares']['count']
-                except KeyError:
-                    log_error(post,'error_log.json')
-            if 'comments' in post:
-                try:
-                    comments = post['comments']['summary']['total_count']
-                except KeyError:
-                    log_error(post,'error_log.json')
+            likes = post.get('likes', {}).get('summary', {}).get('total_count', 0)
+            shares = post.get('shares', {}).get('count', 0)
+            comments = post.get('comments',{}).get('summary', {}).get('total_count', 0)
             insights = {}
-            no_insights = False
             try:
                 insights_data = post['insights']['data']
             except KeyError:
-                no_insights = True
-            for insight in insights_data:
-                insights[insight['name']] = insight['values'][0]['value']
-            if no_insights:
                 posts_dict[post['id']] = [
                     message,
                     created_time,
@@ -115,9 +95,11 @@ def get_posts_and_interactions(interval=False):
                     shares,
                     comments
                     ]
+            for insight in insights_data:
+                insights[insight['name']] = insight['values'][0]['value']
             else:
                 impressions = insights.get('post_impressions', 0)
-                link_clicks = insights['post_consumptions_by_type'].get('link clicks', 0)
+                link_clicks = insights.get('post_consumptions_by_type', {}).get('link clicks', 0)
                 posts_dict[post['id']] = [
                     message,
                     created_time,
