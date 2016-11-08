@@ -83,21 +83,12 @@ def get_posts_and_interactions(interval=False):
             created_time = post['created_time'].replace('T', ' ').replace('+0000', '')
             likes = post.get('likes', {}).get('summary', {}).get('total_count', 0)
             shares = post.get('shares', {}).get('count', 0)
-            comments = post.get('comments',{}).get('summary', {}).get('total_count', 0)
+            comments = post.get('comments', {}).get('summary', {}).get('total_count', 0)
             insights = {}
             try:
                 insights_data = post['insights']['data']
-            except KeyError:
-                posts_dict[post['id']] = [
-                    message,
-                    created_time,
-                    likes,
-                    shares,
-                    comments
-                    ]
-            for insight in insights_data:
-                insights[insight['name']] = insight['values'][0]['value']
-            else:
+                for insight in insights_data:
+                    insights[insight['name']] = insight['values'][0]['value']
                 impressions = insights.get('post_impressions', 0)
                 link_clicks = insights.get('post_consumptions_by_type', {}).get('link clicks', 0)
                 posts_dict[post['id']] = [
@@ -109,7 +100,14 @@ def get_posts_and_interactions(interval=False):
                     impressions,
                     link_clicks
                     ]
-            
+            except KeyError:
+                posts_dict[post['id']] = [
+                    message,
+                    created_time,
+                    likes,
+                    shares,
+                    comments
+                    ]
         if 'paging' in posts:
             posts = requests.get(posts['paging']['next']).json()
         else:
@@ -140,8 +138,9 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     likes.limit(0).summary(total_count),\
                     comments.limit(0).summary(total_count),\
                     reactions.limit(0).summary(total_count),\
-                    video_insights}&limit=%s&since=%s&until=%s\
-                    &access_token=%s' %(list_id, limit, since, now, fb_long_token)
+                    video_insights}\
+                    &limit=%s&since=%s&until=%s&access_token=%s' %(list_id,
+                        limit, since, now, fb_long_token)
                     )
             else:
                 url = (base_url +
@@ -149,7 +148,8 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     likes.limit(0).summary(total_count),\
                     comments.limit(0).summary(total_count),\
                     reactions.limit(0).summary(total_count),\
-                    video_insights}&limit=%s&access_token=%s' %(list_id, limit, fb_long_token)
+                    video_insights}&limit=%s&access_token=%s' %(list_id, limit,
+                        fb_long_token)
                     )
         else:
             if interval:
@@ -158,8 +158,9 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     comments.limit(0).summary(total_count),\
                     likes.limit(0).summary(total_count),\
                     reactions.limit(0).summary(total_count),\
-                    video_insights{values,name}&limit=%s&since=%s&until=%s\
-                    &access_token=%s' %(fb_page_id, limit, since, now, fb_long_token)
+                    video_insights{values,name}\
+                    &limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id, 
+                        limit, since, now, fb_long_token)
                     )
             else:
                 url = (base_url +
@@ -168,8 +169,9 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     likes.limit(0).summary(total_count),\
                     shares.limit(0).summary(total_count),\
                     reactions.limit(0).summary(total_count),\
-                    video_insights{values,name}&limit=%s&access_token=%s' %(fb_page_id,
-                        limit, fb_long_token)
+                    video_insights{values,name}\
+                    &limit=%s&access_token=%s' %(fb_page_id, limit,
+                        fb_long_token)
                     )
 
         videos = requests.get(url).json()
@@ -203,37 +205,21 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
             likes = 0
             comments = 0
             reactions = 0
-            if 'likes' in video:
-                try:
-                    likes = video['likes']['summary']['total_count']
-                except KeyError:
-                    log_error(video,'error_log.json')
-            if 'comments' in video:
-                try:
-                    comments = video['comments']['summary']['total_count']
-                except KeyError:
-                    log_error(video,'error_log.json')
-            if 'reactions' in video:
-                try:
-                    reactions = video['reactions']['summary']['total_count']
-                except KeyError:
-                    log_error(video,'error_log.json')
+            likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
+            comments = video.get('comments', {}).get('summary', {}).get('total_count', 0)
+            reactions = video.get('reactions', {}).get('summary', {}).get('total_count', 0)
             
             insights = {}
-            no_insights = False
             try:
                 insights_data = video['video_insights']['data']
             except KeyError:
-                no_insights = True
-            for insight in insights_data:
-                insights[insight['name']] = insight['values'][0]['value']
-            if no_insights:
                 videos_dict[video['id']] = [title, description, created_time, length, likes, comments, reactions]
             else:
-                try:
-                    shares = insights['total_video_stories_by_action_type']['share']
-                except KeyError:
-                    shares = 0
+                for insight in insights_data:
+                    insights[insight['name']] = insight['values'][0]['value']
+                shares = insights.get('total_video_stories_by_action_type', {}).get('share', 0)
+                page_owned_views = insights.get('total_video_views_by_distribution_type', {}).get('page_owned',0)
+                shared_views = insights.get('total_video_views_by_distribution_type', {}).get('shared',0)
                 avg_sec_watched = round(float(insights['total_video_avg_time_watched']) / 1000.0, 3)
                 avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
                 videos_dict[video['id']] = [
@@ -247,6 +233,7 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     insights['total_video_30s_views_unique'], 
                     insights['total_video_complete_views'],
                     avg_sec_watched, avg_completion,
+                    page_owned_views, shared_views,
                     insights['total_video_views_autoplayed'],
                     insights['total_video_views_clicked_to_play'],
                     insights['total_video_views_organic'],
@@ -281,7 +268,7 @@ def get_video_stats(interval = False, video_lab = False, list_id = None):
                     insights['total_video_impressions_fan'],
                     insights['total_video_impressions_fan_paid_unique'],
                     insights['total_video_impressions_fan_paid'] 
-                    ]
+                    ]   
         try: 
             videos = requests.get(videos['paging']['next']).json()
         except KeyError:
@@ -335,17 +322,16 @@ def get_video_time_series(start_date = time_series_start_date):
             try:
                 insights_data = video['video_insights']['data']
             except KeyError:
-                no_insights = True
-            for insight in insights_data:
-                insights[insight['name']] = insight['values'][0]['value']
-            if no_insights:
                 videos_dict[video['id']] = [title, created_time, now]
             else:
+                for insight in insights_data:
+                    insights[insight['name']] = insight['values'][0]['value']                
                 videos_dict[video['id']] = [
                     title, created_time, now,
                     insights['total_video_views'],
                     insights['total_video_views_unique'],
-                    insights['total_video_10s_views_unique']]
+                    insights['total_video_10s_views_unique']
+                    ]
         try: 
             videos = requests.get(videos['paging']['next']).json()
         except KeyError:
@@ -427,12 +413,10 @@ def get_video_views_demographics(interval = False, video_lab = False, list_id = 
             try:
                 insights_data = video['video_insights']['data']
             except KeyError:
-                no_insights = True
-            for insight in insights_data:
-                insights[insight['name']] = insight['values'][0]['value']
-            if no_insights:
                 videos_dict[video['id']] = []
             else:
+                for insight in insights_data:
+                    insights[insight['name']] = insight['values'][0]['value']
                 try:
                     regions = insights['total_video_view_time_by_region_id']
                     regions_data = [] # 45 regions
@@ -454,6 +438,7 @@ def get_video_views_demographics(interval = False, video_lab = False, list_id = 
                     age_gender_data = ['' for x in range(21)]
                     print("no age or gender data for video %s" %video['id'])
                 videos_dict[video['id']] = age_gender_data + regions_data
+
 
         try: 
             videos = requests.get(videos['paging']['next']).json()
