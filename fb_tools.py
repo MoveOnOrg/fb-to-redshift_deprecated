@@ -4,10 +4,10 @@
 """
 
 from redshift import rsm
-from fb import get_posts_and_interactions, get_video_stats,
-    get_video_time_series, get_video_views_demographics
-from settings import aws_access_key, aws_secret_key, s3_bucket, test,
-    files_dir, s3_bucket_dir
+from fb import (get_posts_and_interactions, get_video_stats,
+    get_video_time_series, get_video_views_demographics)
+from settings import (aws_access_key, aws_secret_key, s3_bucket, test,
+    files_dir, s3_bucket_dir)
 import boto
 import csv
 

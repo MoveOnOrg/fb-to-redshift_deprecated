@@ -6,8 +6,8 @@
 
 from fb_tools import create_import_file, upload_to_s3, update_redshift
 from time import gmtime, strftime
-from settings import test, files_dir, s3_bucket, s3_bucket_dir, data_types,
-    redshift_import
+from settings import (test, files_dir, s3_bucket, s3_bucket_dir, data_types,
+    redshift_import)
 
 def main():
     print()
