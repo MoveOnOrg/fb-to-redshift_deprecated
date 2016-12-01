@@ -10,7 +10,7 @@ Many, many settings in this script must/can be customized to suit your needs.
 * Facebook account with admin access to target Facebook Page
 * (optional) Amazon S3 bucket and Redshift user with ability to create tables in a given schema (named `facebook` in the examples here)
 
-## Installation
+## Installation and use
 
 ### 1. Clone this repo
 ### 2. Create a virtualenv and activate it. 
@@ -105,3 +105,9 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 ####2. I want to rename/reorder the columns in the CSVs.
 
   * You can edit the column names in the ['columns'] parameter in the appropriate parameter dictionary; but keep in mind that that will break Redshift import unless you also rename the Redshift table columns. If you change the column order in settings.py, you'll also have to change it in the appropriate fb.py function.
+
+## Ideas for potential contributions
+
+* Integration with the Facebook Marketing API for ads data.
+* Data import into other database types.
+* Other tools that facilitate download, formatting and import of data from Facebook.
