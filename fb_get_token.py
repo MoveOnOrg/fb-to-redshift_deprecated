@@ -5,7 +5,9 @@
     See README.md for how to get an immortal token.
 """
 
-from settings import fb_version, fb_page_id, fb_long_token, user_access_token, client_id, client_secret
+from settings import (
+    fb_version, fb_page_id, fb_long_token, user_access_token, client_id,
+    client_secret)
 import requests
 
 base_url = "https://graph.facebook.com/%s/" %fb_version

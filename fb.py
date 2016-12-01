@@ -4,8 +4,8 @@
     and parse the response.
 """
 
-from settings import fb_version, fb_page_id, fb_long_token, post_limit,
-    time_series_start_date
+from settings import (
+    fb_version, fb_page_id, fb_long_token, post_limit, time_series_start_date)
 import requests
 import json
 import sys
@@ -43,7 +43,7 @@ def get_posts_and_interactions(interval=False):
     # incrementally smaller amounts of data until it succeeds
     # or it runs out of chances.
 
-    while too_many_posts_at_a_time and limit > 0:
+    while too_many_posts_at_a_time and int(limit) > 0:
         # Edit these URLs to change what data you get from the API.
         # Use the Facebook Graph API explorer to test new URLs.    
         if interval:
@@ -83,7 +83,7 @@ def get_posts_and_interactions(interval=False):
         else:
             too_many_posts_at_a_time = False
 
-    if limit <= 0:
+    if int(limit) <= 0:
         print("Failed to retrieve post data. Logged errors to error_log.json")
         return None
 
@@ -154,7 +154,7 @@ def get_video_stats(interval=False, list_id=False):
     limit = post_limit
     too_many_videos_at_a_time = True
 
-    while too_many_videos_at_a_time and limit > 0:
+    while too_many_videos_at_a_time and int(limit) > 0:
         if list_id:
             if interval:
                 url = (
@@ -213,7 +213,7 @@ def get_video_stats(interval=False, list_id=False):
         else:
             too_many_videos_at_a_time = False
 
-    if limit <= 0:
+    if int(limit) <= 0:
         print("Failed to retrieve video data. Logged errors to error_log.json")
         return None
     else:
@@ -326,7 +326,7 @@ def get_video_time_series(start_date = time_series_start_date):
     too_many_videos_at_a_time = True
     limit = post_limit
 
-    while too_many_videos_at_a_time and limit > 0:
+    while too_many_videos_at_a_time and int(limit) > 0:
         url = (
             base_url +
             '%s/videos?fields=title,created_time,video_insights{values,name}'
@@ -348,7 +348,7 @@ def get_video_time_series(start_date = time_series_start_date):
         else:
             too_many_videos_at_a_time = False
     
-    if limit <= 0:
+    if int(limit) <= 0:
         print("Failed to retrieve video time series data. Logged errors to error_log.json")
         return None
     else:
@@ -399,7 +399,7 @@ def get_video_views_demographics(interval = False, list_id = False):
     limit = post_limit
     too_many_videos_at_a_time = True
 
-    while too_many_videos_at_a_time and limit > 0:
+    while too_many_videos_at_a_time and int(limit) > 0:
         if list_id:
             if interval:
                 url = (
@@ -450,13 +450,13 @@ def get_video_views_demographics(interval = False, list_id = False):
         else:
             too_many_videos_at_a_time = False
     
-    if limit <= 0:
+    if int(limit) <= 0:
         print("Failed to retrieve video time series data. Logged errors to error_log.json")
         return None
     else:
         videos_dict = {}
         pagination = True
-        if video_lab:
+        if list_id:
             videos = videos['videos']
 
         while pagination:

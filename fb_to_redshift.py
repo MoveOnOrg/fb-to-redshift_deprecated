@@ -6,8 +6,7 @@
 
 from fb_tools import create_import_file, upload_to_s3, update_redshift
 from time import gmtime, strftime
-from settings import (test, files_dir, s3_bucket, s3_bucket_dir, data_types,
-    redshift_import)
+from settings import test, files_dir, s3_bucket, data_types, redshift_import
 
 def main():
     print()
@@ -33,7 +32,7 @@ def main():
                 item.get('tablename'), item.get('columns'), 
                 item.get('primary_key'), item.get('filename'))
             print("updated redshift table " + item.get('tablename'))
-        print("Done!")
+    print("Done!")
 
 if __name__=='__main__':
    main()

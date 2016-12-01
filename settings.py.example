@@ -164,6 +164,7 @@ db_user = ''
 db_host = 'host:port'
 db_pwd = ''
 db_name = ''
+test = False # If True, import will use test tables (add _test to tablename)
 
 # OPTIONAL for fb_video_time_series.py only
 time_series_start_date = 'YYYY-mm-DD HH:MM:00'
