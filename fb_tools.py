@@ -75,9 +75,11 @@ WHERE %s IS NULL;
 DROP TABLE %s; 
 
 -- End transaction 
-END;"""%(staging_table_name, table_name, staging_table_name, column_names,
+END;"""%(
+    staging_table_name, table_name, staging_table_name, column_names,
     s3_bucket, s3_bucket_dir + filename, aws_access_key, aws_secret_key,
     table_name, columns_to_stage, staging_table_name, table_key,
     staging_table_key, table_name, staging_table_name, table_name,
     staging_table_key, table_key, table_key, staging_table_name)
+    
     rsm.db_query(command)
