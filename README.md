@@ -18,6 +18,7 @@ Many, many settings in this script must/can be customized to suit your needs.
 If Python 3 is not your default Python version, you'll need to tell virtualenv which version of Python to use.
 
   `virtualenv ve` or `virtualenv -p /path/to/python3 ve`
+
   `. ve/bin/activate`
 
 ### 3. Install requirements
@@ -52,16 +53,16 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
   * If you run fb_to_redshift.py now with `redshift_import` set to False and without editing the parameter dictionaries, and your Page has post and video data, you should find three tidy CSVs (fb_posts.csv, fb_videos.csv and fb_video_viewer_demographics.csv) in the directory you specified in the `files_dir` variable -- assuming you got the Facebook settings right.
 
   * There are six types of data downloads available, with corresponding template dictionaries in settings.py and retrieval functions in fb.py: 
-    * Basic post data (`posts`, `get_posts_and_interactions`)
-    * Video insights for all Page videos OR for all Page videos in a video list (`videos` and `video_list`, `get_video_stats`)
-    * Video viewer demographics for all Page videos OR for all Page videos in a video list (`video_viewer_demographics` and `video_list_viewer_demographics`, `get_video_views_demographics`)
+    * Basic post data (`posts` via `get_posts_and_interactions`)
+    * Video insights for all Page videos OR for all Page videos in a video list (`videos` and `video_list` via `get_video_stats`)
+    * Video viewer demographics for all Page videos OR for all Page videos in a video list (`video_viewer_demographics` and `video_list_viewer_demographics` via `get_video_views_demographics`)
     * Simple video view stats, collected at regular intervals to create a time series of video views (See fb_video_time_series.py and `get_video_time_series`)
 
   * If you want to use `video_list` or `video_list_viewer_demographics` to pull video data from only the videos in a particular Facebook Page list, you'll need to get the list_ids.
     * To find the Facebook video list ids, visit [Graph API explorer](https://developers.facebook.com/tools/explorer/) and get a valid Page token. Next to `GET -> /v2.8/` enter `[page_id]?fields=video_lists` and submit to get a list of all the Page video lists and IDs.
-  * `[interval]` can be used in combination with `post_limit` to limit the amount of data retrieved by each API call. If you leave `[interval]` set to `False` the script will try to pull all available post or video data.
-  * [`tablename`] is used only if `redshift_import` is set to True.
-  * *!IMPORTANT*: `data_types` list should include only the parameter dictionaries that correspond to CSVs that you want to generate (and maybe import). The script will loop through them to get the corresponding data.
+  * `['interval']` can be used in combination with `post_limit` to limit the amount of data retrieved by each API call. If you leave `['interval']` set to `False` the script will try to pull all available post or video data.
+  * `['tablename']` is used only if `redshift_import` is set to True.
+  * **!IMPORTANT**: `data_types` should include only the parameter dictionaries that correspond to CSVs that you want to generate (and maybe import). The script will loop through them to get the corresponding data.
     
 #### c. (OPTIONAL) Set up Redshift import.
   * Set `redshift_import` to True, and this script will attempt to upload the generated CSVs to an S3 bucket and import the data into Redshift tables.
@@ -83,22 +84,24 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 
   `python fb_to_redshift.py`
 
-  * This script can take a *long time* to run, due to pagination, if the Page you're pulling posts from has a lot of posts or videos.
+  * This script can take a *long time* to run, due to pagination, if the Page you're pulling from has a lot of posts or videos.
 
   * You'll get an error if you try to pull too much data at once. Edit `post_limit` and the `[interval]` parameter to reduce the amount of data you're requesting per API call.
 
-### 6. Optional: Generate a time series of video views by running `python fb_video_time_series.py`
+### 6. Optional: Generate a time series of video views. 
 
-  * This script uses the same settings.py file as the other one, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code (as it needs to run frequently, like on a cron job, to generate time series data). Set a `time_series_start_date` in settings.py. If you're using a Redshift table to store the time series data then be sure to create the table first:
+  `python fb_video_time_series.py`
+
+  * fb_video_time_series.pyuses the same settings.py file as the other one, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code (as it needs to run frequently, like on a cron job, to generate time series data). Set a `time_series_start_date` in settings.py. If you're using a Redshift table to store the time series data then be sure to create the table first:
 
     * `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, primary key (video_id, snapshot_time));`
 
 ## FAQ
 
-*1. How do I get different data from the Graph API?*
+####1. How do I get different data from the Graph API?
 
   * Changing which fields are retrieved requires editing the parameter dictionaries and the corresponding functions in fb.py. If you're importing data into Redshift as well, you'll need to change the column names and data types to match. This is fussy work! Refer to the [Graph API reference](https://developers.facebook.com/docs/graph-api/reference) to guide you through which fields you need and use the [Graph API explorer](https://developers.facebook.com/tools/explorer/) to test and tweak your new URL and generate a sample API response.
 
-*2. I want to rename the columns in the CSVs.*
+####2. I want to rename/reorder the columns in the CSVs.
 
-  * Without changing their order, you can edit the ['columns'] parameter in the appropriate parameter dictionary; but keep in mind that that will break Redshift import unless you also rename the Redshift table columns.
+  * You can edit the column names in the ['columns'] parameter in the appropriate parameter dictionary; but keep in mind that that will break Redshift import unless you also rename the Redshift table columns. If you change the column order in settings.py, you'll also have to change it in the appropriate fb.py function.
