@@ -48,24 +48,24 @@ def get_posts_and_interactions(interval=False):
         # Use the Facebook Graph API explorer to test new URLs.    
         if interval:
             url = (base_url +
-                '%s/posts?fields=message,created_time,id,\
-                likes.limit(0).summary(total_count),\
-                comments.limit(0).summary(total_count),\
-                shares,\
-                insights.metric(post_impressions,\
-                post_consumptions_by_type){values,name}\
-                &limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id,
-                    limit, since, now, fb_long_token)
-                )
+                '%s/posts?fields=message,created_time,id,'
+                'likes.limit(0).summary(total_count),'
+                'comments.limit(0).summary(total_count),'
+                'shares,'
+                'insights.metric(post_impressions,post_consumptions_by_type)'
+                '{values,name}'
+                '&limit=%s&since=%s&until=%s&access_token=%s'
+                %(fb_page_id,limit, since, now, fb_long_token))
         else:
             url = (base_url +
-                '%s/posts?fields=message,created_time,id,\
-                likes.limit(0).summary(true),\
-                comments.limit(0).summary(true),\
-                shares,\
-                insights.metric(post_impressions,post_consumptions_by_type){values,name}\
-                &limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
-                )
+                '%s/posts?fields=message,created_time,id,'
+                'likes.limit(0).summary(true),'
+                'comments.limit(0).summary(true),'
+                'shares,'
+                'insights.metric(post_impressions,post_consumptions_by_type)'
+                '{values,name}'
+                '&limit=%s&access_token=%s'
+                %(fb_page_id, limit, fb_long_token))
         
         posts = requests.get(url).json()
 
@@ -157,46 +157,46 @@ def get_video_stats(interval=False, list_id=False):
     while too_many_videos_at_a_time and limit > 0:
         if list_id:
             if interval:
-                url = (base_url +
-                    '%s/?fields=videos{title,description,created_time,length,\
-                    likes.limit(0).summary(total_count),\
-                    comments.limit(0).summary(total_count),\
-                    reactions.limit(0).summary(total_count),\
-                    video_insights}\
-                    &limit=%s&since=%s&until=%s&access_token=%s' %(list_id,
-                        limit, since, now, fb_long_token)
-                    )
+                url = (
+                    base_url +
+                    '%s/?fields=videos{title,description,created_time,length,'
+                    'likes.limit(0).summary(total_count),'
+                    'comments.limit(0).summary(total_count),'
+                    'reactions.limit(0).summary(total_count),'
+                    'video_insights}'
+                    '&limit=%s&since=%s&until=%s&access_token=%s' 
+                    %(list_id, limit, since, now, fb_long_token))
             else:
-                url = (base_url +
-                    '%s/?fields=videos{title,description,created_time,length,\
-                    likes.limit(0).summary(total_count),\
-                    comments.limit(0).summary(total_count),\
-                    reactions.limit(0).summary(total_count),\
-                    video_insights}&limit=%s&access_token=%s' %(list_id, limit,
-                        fb_long_token)
-                    )
+                url = (
+                    base_url +
+                    '%s/?fields=videos{title,description,created_time,length,'
+                    'likes.limit(0).summary(total_count),'
+                    'comments.limit(0).summary(total_count),'
+                    'reactions.limit(0).summary(total_count),'
+                    'video_insights}'
+                    '&limit=%s&access_token=%s' 
+                    %(list_id, limit, fb_long_token))
         else:
             if interval:
-                url = (base_url + 
-                    '%s/videos?fields=title,description,created_time,length,\
-                    comments.limit(0).summary(total_count),\
-                    likes.limit(0).summary(total_count),\
-                    reactions.limit(0).summary(total_count),\
-                    video_insights{values,name}\
-                    &limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id, 
-                        limit, since, now, fb_long_token)
-                    )
+                url = (
+                    base_url + 
+                    '%s/videos?fields=title,description,created_time,length,'
+                    'comments.limit(0).summary(total_count),'
+                    'likes.limit(0).summary(total_count),'
+                    'reactions.limit(0).summary(total_count),'
+                    'video_insights{values,name}'
+                    '&limit=%s&since=%s&until=%s&access_token=%s' 
+                    %(fb_page_id, limit, since, now, fb_long_token))
             else:
-                url = (base_url +
-                    '%s/videos?fields=title,description,created_time,length,\
-                    comments.limit(0).summary(total_count),\
-                    likes.limit(0).summary(total_count),\
-                    shares.limit(0).summary(total_count),\
-                    reactions.limit(0).summary(total_count),\
-                    video_insights{values,name}\
-                    &limit=%s&access_token=%s' %(fb_page_id, limit,
-                        fb_long_token)
-                    )
+                url = (
+                    base_url + 
+                    '%s/videos?fields=title,description,created_time,length,'
+                    'comments.limit(0).summary(total_count),'
+                    'likes.limit(0).summary(total_count),'
+                    'reactions.limit(0).summary(total_count),'
+                    'video_insights{values,name}'
+                    '&limit=%s&access_token=%s' 
+                    %(fb_page_id, limit, fb_long_token))
 
         videos = requests.get(url).json()
         if 'error' in videos:
@@ -249,12 +249,16 @@ def get_video_stats(interval=False, list_id=False):
                         insights[insight['name']] = insight['values'][0]['value']
                     shares = insights.get('total_video_stories_by_action_type',
                         {}).get('share', 0)
-                    page_owned_views = insights.get('total_video_views_by_distribution_type',
-                        {}).get('page_owned',0)
-                    shared_views = insights.get('total_video_views_by_distribution_type',
-                        {}).get('shared',0)
-                    avg_sec_watched = round(float(insights['total_video_avg_time_watched']) / 1000.0, 3)
-                    avg_completion = round(float(insights['total_video_avg_time_watched']) / length / 1000.0, 3)
+                    page_owned_views = insights.get(
+                        'total_video_views_by_distribution_type',{}).get(
+                        'page_owned',0)
+                    shared_views = insights.get(
+                        'total_video_views_by_distribution_type',{}).get(
+                        'shared',0)
+                    avg_sec_watched = round(float(
+                        insights['total_video_avg_time_watched'])/1000.0, 3)
+                    avg_completion = round(float(
+                        insights['total_video_avg_time_watched'])/length/1000.0, 3)
                     videos_dict[video['id']] = [
                         title, description, created_time,
                         length, likes, comments, reactions, shares, 
@@ -300,8 +304,7 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_impressions_fan_unique'],
                         insights['total_video_impressions_fan'],
                         insights['total_video_impressions_fan_paid_unique'],
-                        insights['total_video_impressions_fan_paid'] 
-                        ]   
+                        insights['total_video_impressions_fan_paid']]   
             try: 
                 videos = requests.get(videos['paging']['next']).json()
             except KeyError:
@@ -324,11 +327,11 @@ def get_video_time_series(start_date = time_series_start_date):
     limit = post_limit
 
     while too_many_videos_at_a_time and limit > 0:
-        url = (base_url +
-            '%s/videos?fields=title,created_time,video_insights{values,name}\
-            &limit=%s&since=%s&access_token=%s' %(fb_page_id, limit, since, 
-                fb_long_token)
-            )
+        url = (
+            base_url +
+            '%s/videos?fields=title,created_time,video_insights{values,name}'
+            '&limit=%s&since=%s&access_token=%s' 
+            %(fb_page_id, limit, since, fb_long_token))
 
         videos = requests.get(url).json()
         if 'error' in videos:
@@ -399,32 +402,38 @@ def get_video_views_demographics(interval = False, list_id = False):
     while too_many_videos_at_a_time and limit > 0:
         if list_id:
             if interval:
-                url = (base_url +
-                    '%s/?fields=videos{video_insights.metric(total_video_view_time_by_region_id,\
-                    total_video_view_time_by_age_bucket_and_gender)}\
-                    &limit=%s&since=%s&until=%s&access_token=%s' %(list_id,
-                        limit, since, now, fb_long_token)
-                    )
+                url = (
+                    base_url +
+                    '%s/?fields=videos{video_insights.metric('
+                    'total_video_view_time_by_region_id,'
+                    'total_video_view_time_by_age_bucket_and_gender)}'
+                    '&limit=%s&since=%s&until=%s&access_token=%s'
+                    %(list_id, limit, since, now, fb_long_token))
             else:
-                url = (base_url +
-                    '%s/?fields=videos{video_insights.metric(total_video_view_time_by_region_id,\
-                    total_video_view_time_by_age_bucket_and_gender)}\
-                    &limit=%s&access_token=%s' %(list_id, limit, fb_long_token)
-                    )
+                url = (
+                    base_url +
+                    '%s/?fields=videos{video_insights.metric('
+                    'total_video_view_time_by_region_id,'
+                    'total_video_view_time_by_age_bucket_and_gender)}'
+                    '&limit=%s&access_token=%s' 
+                    %(list_id, limit, fb_long_token))
         else:
             if interval:
-                url = (base_url + 
-                    '%s/videos?fields=video_insights.metric(total_video_view_time_by_region_id,\
-                    total_video_view_time_by_age_bucket_and_gender){values,name}\
-                    &limit=%s&since=%s&until=%s&access_token=%s' %(fb_page_id,
-                        limit, since, now, fb_long_token)
-                    )
+                url = (
+                    base_url + 
+                    '%s/videos?fields=video_insights.metric('
+                    'total_video_view_time_by_region_id,'
+                    'total_video_view_time_by_age_bucket_and_gender){values,name}'
+                    '&limit=%s&since=%s&until=%s&access_token=%s' 
+                    %(fb_page_id, limit, since, now, fb_long_token))
             else:
-                url = (base_url +
-                    '%s/videos?fields=video_insights.metric(total_video_view_time_by_region_id,\
-                    total_video_view_time_by_age_bucket_and_gender){values,name}\
-                    &limit=%s&access_token=%s' %(fb_page_id, limit, fb_long_token)
-                    )
+                url = (
+                    base_url +
+                    '%s/videos?fields=video_insights.metric('
+                    'total_video_view_time_by_region_id,'
+                    'total_video_view_time_by_age_bucket_and_gender){values,name}'
+                    '&limit=%s&access_token=%s' 
+                    %(fb_page_id, limit, fb_long_token))
 
         videos = requests.get(url).json()
         if 'error' in videos:

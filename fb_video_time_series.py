@@ -10,11 +10,9 @@ from fb_tools import create_import_file, upload_to_s3
 from settings import s3_bucket, aws_access_key, aws_secret_key
 from time import gmtime, strftime
 
-# Changing columns requires changes to get_video_time_series in fb.py
-columns = 'video_id,title,created_time,snapshot_time,total_views,'
-columns += 'unique_viewers,views_10sec'
-
-# Edit these variable names to customize.
+columns = (
+    'video_id,title,created_time,snapshot_time,total_views,'
+    'unique_viewers,views_10sec')
 tablename = 'facebook.video_time_series'
 filename = 'fb_video_time_series.csv'
 
@@ -38,15 +36,17 @@ SELECT * FROM %s_staging;
 DROP TABLE %s_staging; 
 
 -- End transaction 
-END;"""%(tablename, tablename, tablename, columns, s3_bucket, filename,
+END;"""%(
+    tablename, tablename, tablename, columns, s3_bucket, filename,
     aws_access_key, aws_secret_key, tablename, tablename, tablename)
 
     rsm.db_query(command)
 
 def main():
     print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
-    create_import_file(False, import_type='time_series',
-        filename='fb_video_time_series.csv', columns=columns)
+    create_import_file(
+        False, import_type='time_series', filename='fb_video_time_series.csv',
+        columns=columns)
     print("created %s" %filename)
     upload_to_s3(filename)
     print("uploaded %s to s3" %filename)

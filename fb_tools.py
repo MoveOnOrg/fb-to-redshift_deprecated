@@ -4,13 +4,16 @@
 """
 
 from redshift import rsm
-from fb import get_posts_and_interactions, get_video_stats, get_video_time_series, get_video_views_demographics
-from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir, s3_bucket_dir
+from fb import get_posts_and_interactions, get_video_stats,
+    get_video_time_series, get_video_views_demographics
+from settings import aws_access_key, aws_secret_key, s3_bucket, test,
+    files_dir, s3_bucket_dir
 import boto
 import csv
 
-def create_import_file(interval=False, import_type='posts',
-    filename='fb_import_posts.csv', columns=False, list_id=None):
+def create_import_file(
+        interval=False, import_type='posts',filename='fb_import_posts.csv',
+        columns=False, list_id=None):
     import_file = open(files_dir + filename, 'w')
     if import_type == 'posts':
         data_dict = get_posts_and_interactions(interval)
