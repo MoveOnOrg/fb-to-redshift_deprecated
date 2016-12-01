@@ -13,7 +13,7 @@ CREATE TABLE facebook.video_time_series_staging (LIKE facebook.video_time_series
 
 -- Load data into the staging table 
 COPY facebook.video_time_series_staging (video_id, title, created_time, snapshot_time, total_views, unique_viewers, views_10sec) 
-FROM 's3://%s/fb_video_time_series.csv' 
+FROM 's3://%s/fb_data/fb_video_time_series.csv' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 FILLRECORD
 delimiter ','; 
