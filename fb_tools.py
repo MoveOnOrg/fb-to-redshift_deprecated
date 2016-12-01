@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-""" Prepare the data for import. Import it into s3 and then into redshift.
+""" Download data and create CSV. Upload CSV to S3. Import to Redshift.
 """
 
 from redshift import rsm
@@ -9,21 +9,24 @@ from settings import aws_access_key, aws_secret_key, s3_bucket, test, files_dir,
 import boto
 import csv
 
-def create_import_file(interval=False, import_type='posts', filename='fb_import_posts.csv', list_id = None):
+def create_import_file(interval=False, import_type='posts',
+    filename='fb_import_posts.csv', columns=False, list_id=None):
     import_file = open(files_dir + filename, 'w')
     if import_type == 'posts':
         data_dict = get_posts_and_interactions(interval)
     if import_type == 'videos':
         data_dict = get_video_stats(interval)
-    if import_type == 'video_lab_videos':
-        data_dict = get_video_stats(interval, True, list_id)
-    if import_type == 'time_series':
+    if import_type == 'video_list':
+        data_dict = get_video_stats(interval, list_id)
+    if import_type == 'video_time_series':
         data_dict = get_video_time_series()
-    if import_type == 'views_demographics':
+    if import_type == 'video_viewer_demographics':
         data_dict = get_video_views_demographics(interval)
-    if import_type == 'views_demographics_video_lab':
-        data_dict = get_video_views_demographics(interval, True, list_id)
+    if import_type == 'video_list_viewer_demographics':
+        data_dict = get_video_views_demographics(interval, list_id)
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
+    if columns:
+        csv_file.writerow(columns)
     csv_file.writerows([[id,]+values for id, values in data_dict.items()])
     import_file.close()
 
@@ -31,13 +34,13 @@ def upload_to_s3(filename='fb_import_posts.csv'):
     conn = boto.connect_s3(aws_access_key, aws_secret_key)
     bucket = conn.lookup(s3_bucket)
     k = boto.s3.key.Key(bucket)
-    k.key = '/' + s3_bucket_dir + filename
+    k.key = filename
     k.set_contents_from_filename(files_dir + filename)
 
 def update_redshift(table_name, columns, primary_key, filename):
     staging_table_name = table_name + "_staging"
     column_names = ", ".join(columns)
-    columns_to_stage = ", ".join([(column + " = s." + column) for column in columns ])
+    columns_to_stage = ", ".join([(column + " = s." + column) for column in columns])
     table_key = table_name + "." + primary_key
     staging_table_key = "s." + primary_key
 
@@ -49,7 +52,8 @@ COPY %s (%s)
 FROM 's3://%s/%s' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 FILLRECORD
-delimiter ','; 
+delimiter ','
+IGNOREHEADER 1; 
 
 -- Update records 
 UPDATE %s
@@ -67,9 +71,9 @@ WHERE %s IS NULL;
 DROP TABLE %s; 
 
 -- End transaction 
-END;"""%(staging_table_name, table_name, staging_table_name, column_names, s3_bucket, s3_bucket_dir + filename, aws_access_key, aws_secret_key, table_name, columns_to_stage, staging_table_name, table_key, staging_table_key, table_name, staging_table_name, table_name, staging_table_key, table_key, table_key, staging_table_name )
-    # if test:
-    #     print("Query: %s" %command)
-    # else:
-    #     rsm.db_query(command)
+END;"""%(staging_table_name, table_name, staging_table_name, column_names,
+    s3_bucket, s3_bucket_dir + filename, aws_access_key, aws_secret_key,
+    table_name, columns_to_stage, staging_table_name, table_key,
+    staging_table_key, table_name, staging_table_name, table_name,
+    staging_table_key, table_key, table_key, staging_table_name)
     rsm.db_query(command)
