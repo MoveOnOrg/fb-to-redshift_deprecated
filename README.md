@@ -31,7 +31,7 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 
   * If you haven't already, you will need to [register a Facebook app](https://developers.facebook.com/docs/apps/register) and [associate it with the Page](http://stackoverflow.com/questions/9265062/how-to-link-a-facebook-app-with-an-existing-fan-page) you're looking to pull data for. You will need to also be an administrator of the Page for this to work.
   
-#### a. Get a long-lived access token (fb_long_token)
+#### a. Get a long-lived access token (`fb_long_token`)
   * Go to [Facebook's Graph API Explorer](https://developers.facebook.com/tools/explorer) and make sure it is associated with your app (top right drop down).
   * Get your user access token, ensuring `manage_pages` and `read_insights` are both selected as permissions.
   * Add your user access token in as the value in the variable `user_access_token` in settings.py.
@@ -88,13 +88,15 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 
   * You'll get an error if you try to pull too much data at once. Edit `post_limit` and the `[interval]` parameter to reduce the amount of data you're requesting per API call.
 
+  * If you set `test` to `True`, your CSVs will have '_test' appended to the filename. If you also set `redshift_import` to 'true', the script will append '_test' to the tablenames - so you must create tables in advance of running the script in test mode for import to work. E.g. `CREATE TABLE facebook.videos_test (LIKE facebook.videos)`.
+
 ### 6. Optional: Generate a time series of video views. 
 
   `python fb_video_time_series.py`
 
-  * fb_video_time_series.pyuses the same settings.py file as the other one, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code (as it needs to run frequently, like on a cron job, to generate time series data). Set a `time_series_start_date` in settings.py. If you're using a Redshift table to store the time series data then be sure to create the table first:
+  * fb_video_time_series.py uses the same settings.py file as the other one, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code (as it needs to run frequently, like on a cron job, to generate time series data). Set a `time_series_start_date` in settings.py. If you're using a Redshift table to store the time series data then be sure to create the table first:
 
-    * `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, primary key (video_id, snapshot_time));`
+    `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, primary key (video_id, snapshot_time));`
 
 ## FAQ
 

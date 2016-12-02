@@ -85,7 +85,7 @@ def get_posts_and_interactions(interval=False):
 
     if int(limit) <= 0:
         print("Failed to retrieve post data. Logged errors to error_log.json")
-        return None
+        return False
 
     else:
         posts_dict = {}
@@ -215,7 +215,7 @@ def get_video_stats(interval=False, list_id=False):
 
     if int(limit) <= 0:
         print("Failed to retrieve video data. Logged errors to error_log.json")
-        return None
+        return False
     else:
         videos_dict = {}
         pagination = True
@@ -350,7 +350,7 @@ def get_video_time_series(start_date = time_series_start_date):
     
     if int(limit) <= 0:
         print("Failed to retrieve video time series data. Logged errors to error_log.json")
-        return None
+        return False
     else:
         videos_dict = {}
         pagination = True
@@ -452,7 +452,7 @@ def get_video_views_demographics(interval = False, list_id = False):
     
     if int(limit) <= 0:
         print("Failed to retrieve video time series data. Logged errors to error_log.json")
-        return None
+        return False
     else:
         videos_dict = {}
         pagination = True

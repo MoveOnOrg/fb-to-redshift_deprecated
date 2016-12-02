@@ -6,7 +6,8 @@
 
 from fb_tools import create_import_file, upload_to_s3, update_redshift
 from time import gmtime, strftime
-from settings import test, files_dir, s3_bucket, data_types, redshift_import
+from settings import (
+    test, files_dir, s3_bucket, s3_bucket_dir, data_types, redshift_import)
 
 def main():
     print()
@@ -14,20 +15,23 @@ def main():
     for item in data_types:
         if test:
             item['tablename'] += '_test'
+            item['filename'] = ('_test.').join(item['filename'].split('.'))
         if 'list_id' in item:
-            create_import_file(
+            created_file = create_import_file(
                 item.get('interval'), item.get('import_type'),
                 item.get('filename'), item.get('columns'), item.get('list_id'))
         else:
-            create_import_file(
+            created_file = create_import_file(
                 item.get('interval'), item.get('import_type'),
                 item.get('filename'), item.get('columns'))
+        if not created_file:
+            continue
         print("created %s " %(files_dir + item.get('filename')))
         if redshift_import:
             upload_to_s3(item.get('filename'))
             print(
-                "uploaded %s to s3 bucket s3://%s" 
-                %(files_dir + item.get('filename'), s3_bucket))
+                "uploaded %s to s3 bucket s3://%s/%s" 
+                %(files_dir + item.get('filename'), s3_bucket_dir, s3_bucket))
             update_redshift(
                 item.get('tablename'), item.get('columns'), 
                 item.get('primary_key'), item.get('filename'))
