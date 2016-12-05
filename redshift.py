@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import settings
+
 from datetime import timedelta, datetime
 import os
 import sqlalchemy
@@ -26,5 +26,3 @@ class RedShiftMediator(object):
 
     def db_close(self):
         self.dbsession.close()
-
-rsm = RedShiftMediator(settings)

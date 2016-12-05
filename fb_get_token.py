@@ -22,9 +22,14 @@ def get_long_lived_token():
     return token.text[13:]
 
 def get_page_access_token_from_user_token(long_user_access_token):
+    if not user_access_token or not fb_page_id:
+        raise Exception("settings fb_page_id and user_access_token must be set")
     url = base_url + '%s?fields=access_token&access_token=%s' %(
         fb_page_id, user_access_token)
     page_token = requests.get(url).json()
-    print(page_token['access_token'])
+    if page_token.get('error'):
+        print(page_token)
+    else:
+        print(page_token['access_token'])
     
 get_page_access_token_from_user_token(get_long_lived_token())
