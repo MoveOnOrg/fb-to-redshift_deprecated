@@ -3,14 +3,17 @@
 """ Download data and create CSV. Upload CSV to S3. Import to Redshift.
 """
 
-from redshift import rsm
+from redshift import RedShiftMediator
 from fb import (
     get_posts_and_interactions, get_video_stats, get_video_time_series,
     get_video_views_demographics)
 from settings import (
     aws_access_key, aws_secret_key, s3_bucket, s3_bucket_dir, files_dir, test)
+import settings
 import boto
 import csv
+
+rsm = None
 
 def create_import_file(
         interval=False, import_type='posts',filename='fb_import_posts.csv',
@@ -45,6 +48,9 @@ def upload_to_s3(filename='fb_import_posts.csv'):
     k.set_contents_from_filename(files_dir + filename)
 
 def update_redshift(table_name, columns, primary_key, filename):
+    global rsm
+    if rsm is None:
+        rsm = RedShiftMediator(settings)
     staging_table_name = table_name + "_staging"
     column_names = ", ".join(columns)
     columns_to_stage = ", ".join([(column + " = s." + column) for column in columns])
