@@ -17,9 +17,9 @@ Many, many settings in this script must/can be customized to suit your needs.
 
 If Python 3 is not your default Python version, you'll need to tell virtualenv which version of Python to use.
 
-  `virtualenv ve` or `virtualenv -p /path/to/python3 ve`
+  `virtualenv venv` or `virtualenv -p /path/to/python3 venv`
 
-  `. ve/bin/activate`
+  `. venv/bin/activate`
 
 ### 3. Install requirements
 
