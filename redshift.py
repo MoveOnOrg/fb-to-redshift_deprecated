@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import settings
+
 from datetime import timedelta, datetime
 import os
 import sqlalchemy
@@ -9,7 +9,8 @@ import sqlalchemy.orm
 class RedShiftMediator(object):
 
     def __init__(self, settings):
-
+        if settings.db_host == 'host:port':
+            raise Exception("settings.db_host must be properly configured")
         self.dbengine = sqlalchemy.create_engine(
             'postgresql+psycopg2://{user}:{passwd}@{host}/{db}'.format(
                 host=settings.db_host,
@@ -26,5 +27,3 @@ class RedShiftMediator(object):
 
     def db_close(self):
         self.dbsession.close()
-
-rsm = RedShiftMediator(settings)

@@ -5,11 +5,12 @@
     data in the specified Redshift table.
 """
 
-from redshift import rsm
+from redshift import RedShiftMediator
 from fb_tools import create_import_file, upload_to_s3
 from settings import (
     s3_bucket, s3_bucket_dir, aws_access_key, aws_secret_key, test,
     redshift_import)
+import settings
 from time import gmtime, strftime
 
 columns = (
@@ -22,7 +23,7 @@ if test:
     tablename += '_test'
     filename = ('_test.').join(filename.split('.'))
 
-def update_redshift_video_time_series():
+def update_redshift_video_time_series(rsm):
     command = """-- Create a staging table 
 CREATE TABLE %s_staging (LIKE %s);
 
@@ -50,6 +51,7 @@ END;"""%(
 
 def main():
     print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+    rsm = RedShiftMediator(settings)
     created_file = create_import_file(
         False, import_type='video_time_series', filename=filename, columns=columns)
     if created_file:
@@ -57,7 +59,7 @@ def main():
         if redshift_import:
             upload_to_s3(filename)
             print("uploaded %s to s3" %filename)
-            update_redshift_video_time_series()
+            update_redshift_video_time_series(rsm)
             print("updated redshift table %s" %tablename)
 
 if __name__=='__main__':
