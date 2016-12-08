@@ -50,8 +50,9 @@ END;"""%(
 
 def main():
     print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+    columns_list = columns.split(',')
     created_file = create_import_file(
-        False, import_type='video_time_series', filename=filename, columns=columns)
+        False, import_type='video_time_series', filename=filename, columns=columns_list)
     if created_file:
         print("created %s" %filename)
         if redshift_import:
