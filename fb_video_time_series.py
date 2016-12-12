@@ -1,39 +1,67 @@
-""" Gets and imports the video time series data into redshift.
-    Separate file so it can easily be scheduled separately from the other, bulkier facebook data imports.
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+""" Get and import video view data into Redshift. Run this regularly
+    (perhaps on a cron job) to generate a time series of video views
+    data in the specified Redshift table.
 """
 
-from redshift import rsm
+from redshift import RedShiftMediator
 from fb_tools import create_import_file, upload_to_s3
-from settings import s3_bucket, aws_access_key, aws_secret_key
+from settings import (
+    s3_bucket, s3_bucket_dir, aws_access_key, aws_secret_key, test,
+    redshift_import)
+import settings
 from time import gmtime, strftime
 
-def update_redshift_video_time_series():
+columns = (
+    'video_id,title,created_time,snapshot_time,total_views,'
+    'unique_viewers,views_10sec')
+tablename = 'facebook.video_time_series'
+filename = 'fb_video_time_series.csv'
+
+if test:
+    tablename += '_test'
+    filename = ('_test.').join(filename.split('.'))
+
+def update_redshift_video_time_series(rsm):
     command = """-- Create a staging table 
-CREATE TABLE facebook.video_time_series_staging (LIKE facebook.video_time_series);
+CREATE TABLE %s_staging (LIKE %s);
 
 -- Load data into the staging table 
-COPY facebook.video_time_series_staging (video_id, title, created_time, snapshot_time, total_views, unique_viewers, views_10sec) 
-FROM 's3://%s/fb_data/fb_video_time_series.csv' 
+COPY %s_staging (%s) 
+FROM 's3://%s/%s/%s' 
 CREDENTIALS 'aws_access_key_id=%s;aws_secret_access_key=%s'
 FILLRECORD
-delimiter ','; 
+delimiter ','
+IGNOREHEADER 1; 
 
 -- Insert records 
-INSERT INTO facebook.video_time_series
-SELECT * FROM facebook.video_time_series_staging;
+INSERT INTO %s
+SELECT * FROM %s_staging;
 
 -- Drop the staging table
-DROP TABLE facebook.video_time_series_staging; 
+DROP TABLE %s_staging; 
 
 -- End transaction 
-END;"""%(s3_bucket, aws_access_key, aws_secret_key)
+END;"""%(
+    tablename, tablename, tablename, columns, s3_bucket, s3_bucket_dir, filename,
+    aws_access_key, aws_secret_key, tablename, tablename, tablename)
 
     rsm.db_query(command)
 
-print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
-create_import_file(False, import_type='time_series', filename='fb_video_time_series.csv')
-print("created fb_video_time_series.csv")
-upload_to_s3("fb_video_time_series.csv")
-print("uploaded fb_video_time_series.csv to s3")
-update_redshift_video_time_series()
-print("updated redshift table facebook.video_time_series")
+def main():
+    print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+    columns_list = columns.split(',')
+    rsm = RedShiftMediator(settings)
+    created_file = create_import_file(
+        False, import_type='video_time_series', filename=filename, columns=columns_list)
+    if created_file:
+        print("created %s" %filename)
+        if redshift_import:
+            upload_to_s3(filename)
+            print("uploaded %s to s3" %filename)
+            update_redshift_video_time_series(rsm)
+            print("updated redshift table %s" %tablename)
+
+if __name__=='__main__':
+   main()
