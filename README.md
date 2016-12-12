@@ -1,6 +1,6 @@
 # Facebook to Redshift
 
-This project connects to the Facebook Graph API (v2.7), downloads data about posts and videos associated with a target Page, and formats and outputs the data as CSVs. It also (optionally) uploads the CSVs into an Amazon S3 bucket and imports the data into a corresponding table into Redshift using the `copy` command.
+This project connects to the Facebook Graph API (v2.7), downloads the latest data about posts and videos associated with a target Page, and formats and outputs the data as CSVs. It also (optionally) uploads the CSVs into an Amazon S3 bucket and imports the data into a corresponding table into Redshift using the `copy` command.
 
 Many, many settings in this script must/can be customized to suit your needs.
 
@@ -94,7 +94,9 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 
   `python fb_video_time_series.py`
 
-  * fb_video_time_series.py uses the same settings.py file as the other one, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code (as it needs to run frequently, like on a cron job, to generate time series data). Set a `time_series_start_date` in settings.py. If you're using a Redshift table to store the time series data then be sure to create the table first:
+  * fb_to_redshift.py grabs the latest data for posts/videos created during the (optional) specified `['interval']`. fb_video_time_series.py grabs a specific set of data for videos created after the `time_series_start_date` in settings.py. If you set redshift_import to `True`, fb_to_redshift.py will overwrite the latest data for existing videos already in the table, while fb_video_time_series.py appends a new row for the latest video at the time of data capture (`snapshot_time`). Thus with the time series option running at regular intervals (e.g. on a cron job) you can capture the way video views, reactions, etc. change over time.
+  * fb_video_time_series.py uses the same settings.py file as fb_to_redshift.py, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code.
+  * Create the Redshift table before running the time series code:
 
     `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, primary key (video_id, snapshot_time));`
 
@@ -106,7 +108,7 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 
 ####2. I want to rename/reorder the columns in the CSVs.
 
-  * You can edit the column names in the ['columns'] parameter in the appropriate parameter dictionary; but keep in mind that that will break Redshift import unless you also rename the Redshift table columns. If you change the column order in settings.py, you'll also have to change it in the appropriate fb.py function.
+  * You can edit the column names in the ['columns'] parameter in the appropriate parameter dictionary; but keep in mind that if you want to reorder the columns you'll also have to change the order in the appropriate fb.py function. Changing column order will also break Redshift import unless you also rename the Redshift table columns.
 
 ## Ideas for potential contributions
 
