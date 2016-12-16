@@ -229,9 +229,6 @@ def get_video_stats(interval=False, list_id=False):
                 created_time = video['created_time'].replace('T',
                     ' ').replace('+0000', '')
                 length = video['length']
-                likes = 0
-                comments = 0
-                reactions = 0
                 likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
                 comments = video.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
@@ -329,7 +326,10 @@ def get_video_time_series(start_date = time_series_start_date):
     while too_many_videos_at_a_time and int(limit) > 0:
         url = (
             base_url +
-            '%s/videos?fields=title,created_time,video_insights{values,name}'
+            '%s/videos?fields=title,created_time,video_insights{values,name},'
+            'comments.limit(0).summary(total_count),'
+            'likes.limit(0).summary(total_count),'
+            'reactions.limit(0).summary(total_count)'
             '&limit=%s&since=%s&access_token=%s' 
             %(fb_page_id, limit, since, fb_long_token))
 
@@ -357,21 +357,31 @@ def get_video_time_series(start_date = time_series_start_date):
         while pagination:
             for video in videos['data']:
                 title = video.get('title', '').replace('\n', ' ').replace(',', ' ')
-                created_time = video['created_time'].replace('T', ' ').replace('+0000', '')            
+                created_time = video['created_time'].replace('T', ' ').replace('+0000', '')
+                likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
+                comments = video.get('comments', {}).get('summary',
+                    {}).get('total_count', 0)
+                reactions = video.get('reactions', {}).get('summary',
+                    {}).get('total_count', 0)          
                 insights = {}
-                no_insights = False
                 try:
                     insights_data = video['video_insights']['data']
                 except KeyError:
-                    videos_dict[video['id']] = [title, created_time, now]
+                    videos_dict[video['id']] = [title, created_time, now, likes, comments, reactions]
                 else:
                     for insight in insights_data:
-                        insights[insight['name']] = insight['values'][0]['value']                
+                        insights[insight['name']] = insight['values'][0]['value']
+                    shares = insights.get('total_video_stories_by_action_type',
+                        {}).get('share', 0)               
                     videos_dict[video['id']] = [
                         title, created_time, now,
+                        likes, comments, reactions,
                         insights['total_video_views'],
                         insights['total_video_views_unique'],
-                        insights['total_video_10s_views_unique']
+                        insights['total_video_10s_views_unique'],
+                        insights['total_video_impressions_unique'],
+                        insights['total_video_view_total_time'],
+                        shares
                         ]
             try: 
                 videos = requests.get(videos['paging']['next']).json()

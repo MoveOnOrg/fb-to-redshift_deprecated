@@ -14,8 +14,8 @@ import settings
 from time import gmtime, strftime
 
 columns = (
-    'video_id,title,created_time,snapshot_time,total_views,'
-    'unique_viewers,views_10sec')
+    'video_id,title,created_time,snapshot_time,likes,comments,reactions,total_views,'
+    'unique_viewers,views_10sec,reach,ms_viewed,shares')
 tablename = 'facebook.video_time_series'
 filename = 'fb_video_time_series.csv'
 

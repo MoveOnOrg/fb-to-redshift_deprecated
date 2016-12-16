@@ -98,7 +98,7 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
   * fb_video_time_series.py uses the same settings.py file as fb_to_redshift.py, and it's encapsulated in its own file so it's easy to run it independently from the rest of the code.
   * Create the Redshift table before running the time series code:
 
-    `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, primary key (video_id, snapshot_time));`
+    `CREATE TABLE facebook.video_time_series(video_id VARCHAR(256), title VARCHAR(max), created_time timestamp, snapshot_time timestamp, total_views INT NULL, unique_viewers INT NULL, views_10sec INT NULL, reach BIGINT NULL, ms_viewed BIGINT NULL, likes INT NULL, comments INT NULL, reactions INT NULL, shares INT NULL, primary key (video_id, snapshot_time));`
 
 ## FAQ
 
