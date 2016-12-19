@@ -9,9 +9,10 @@ setup(
     author_email='opensource@moveon.org',
     packages=['fb-to-redshift'],
     package_dir={'fb-to-redshift': './'}
+    scripts=['fb_get_token.py','fb_to_redshift.py','fb_video_time_series.py']
     url='https://github.com/MoveOnOrg/fb-to-redshift',
     license='MIT',
-    description="fb-to-redshift enables automated download of Facebook Page post and video data in CSV format, and optionally inserts downloaded data into corresponding Redshift tables.",
+    description="Download Facebook Page post and video data in CSV format, and import into Amazon Redshift tables.",
     long_description=textwrap.dedent(open('README.md', 'r').read()),
     keywords = "python facebook redshift",
     classifiers=[
