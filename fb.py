@@ -4,6 +4,14 @@
     and parse the response.
 """
 
+import sys
+import os
+local_settings_path = os.path.join(os.getcwd(),"settings.py")
+print(local_settings_path)
+if os.path.exists(local_settings_path):
+    import imp
+    settings = imp.load_source('settings', local_settings_path)
+
 from settings import (
     fb_version, fb_page_id, fb_long_token, post_limit, time_series_start_date)
 import requests
@@ -13,7 +21,6 @@ from time import gmtime, strftime, time
 from datetime import datetime
 
 base_url = "https://graph.facebook.com/%s/" %fb_version
-
 def log_error(content,logfile):
     error_log = open(logfile,'a')
     error_log.write(strftime("%Y-%m-%d %H:%M:%S", gmtime()))

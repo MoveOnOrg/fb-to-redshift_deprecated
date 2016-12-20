@@ -1,9 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 """ Get access tokens that allow us to get data from Graph API.
     See README.md for how to use.
 """
+
+import sys
+import os
+local_settings_path = os.path.join(os.getcwd(),"settings.py")
+print(local_settings_path)
+if os.path.exists(local_settings_path):
+    import imp
+    settings = imp.load_source('settings', local_settings_path)
 
 from settings import (
     fb_version, fb_page_id, fb_long_token, user_access_token, client_id,
