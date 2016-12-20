@@ -6,7 +6,6 @@
 import sys
 import os
 local_settings_path = os.path.join(os.getcwd(),"settings.py")
-print(local_settings_path)
 if os.path.exists(local_settings_path):
     import imp
     settings = imp.load_source('settings', local_settings_path)
