@@ -467,7 +467,7 @@ def get_video_views_demographics(interval = False, list_id = False):
             too_many_videos_at_a_time = False
     
     if int(limit) <= 0:
-        print("Failed to retrieve video time series data. Logged errors to error_log.json")
+        print("Failed to retrieve video demographics data. Logged errors to error_log.json")
         return False
     else:
         videos_dict = {}
