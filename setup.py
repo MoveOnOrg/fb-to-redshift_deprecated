@@ -8,8 +8,7 @@ setup(
     author='Sandra Chung','Rivkah Standig'
     author_email='opensource@moveon.org',
     packages=['fb-to-redshift'],
-    package_dir={'fb-to-redshift': './'}
-    scripts=['fb_get_token.py','fb_to_redshift.py','fb_video_time_series.py']
+    scripts=['fb-to-redshift/fb_get_token.py','fb-to-redshift/fb_to_redshift.py','fb-to-redshift/fb_video_time_series.py']
     url='https://github.com/MoveOnOrg/fb-to-redshift',
     license='MIT',
     description="Download Facebook Page post and video data in CSV format, and import into Amazon Redshift tables.",
