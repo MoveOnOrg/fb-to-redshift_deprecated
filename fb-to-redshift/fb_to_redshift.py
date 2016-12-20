@@ -33,6 +33,7 @@ def main():
                 item.get('interval'), item.get('import_type'),
                 item.get('filename'), item.get('columns'))
         if not created_file:
+            print("no CSV created")
             continue
         print("created %s " %(files_dir + item.get('filename')))
         if redshift_import:

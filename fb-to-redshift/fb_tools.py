@@ -39,6 +39,7 @@ def create_import_file(
     if import_type == 'video_list_viewer_demographics':
         data_dict = get_video_views_demographics(interval, list_id)
     if not data_dict:
+        print("Could not retrieve %s data" %(import_type))
         return False
     csv_file = csv.writer(import_file, quoting=csv.QUOTE_MINIMAL)
     if columns:
