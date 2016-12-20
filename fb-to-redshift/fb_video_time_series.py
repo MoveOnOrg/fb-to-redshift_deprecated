@@ -5,6 +5,13 @@
     data in the specified Redshift table.
 """
 
+import sys
+import os
+local_settings_path = os.path.join(os.getcwd(),"settings.py")
+if os.path.exists(local_settings_path):
+    import imp
+    settings = imp.load_source('settings', local_settings_path)
+
 from redshift import RedShiftMediator
 from fb_tools import create_import_file, upload_to_s3
 from settings import (
@@ -14,8 +21,8 @@ import settings
 from time import gmtime, strftime
 
 columns = (
-    'video_id,title,created_time,snapshot_time,total_views,'
-    'unique_viewers,views_10sec')
+    'video_id,title,created_time,snapshot_time,likes,comments,reactions,total_views,'
+    'unique_viewers,views_10sec,reach,ms_viewed,shares')
 tablename = 'facebook.video_time_series'
 filename = 'fb_video_time_series.csv'
 

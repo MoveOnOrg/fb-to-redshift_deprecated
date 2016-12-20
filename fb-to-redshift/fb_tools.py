@@ -3,6 +3,13 @@
 """ Download data and create CSV. Upload CSV to S3. Import to Redshift.
 """
 
+import sys
+import os
+local_settings_path = os.path.join(os.getcwd(),"settings.py")
+if os.path.exists(local_settings_path):
+    import imp
+    settings = imp.load_source('settings', local_settings_path)
+
 from redshift import RedShiftMediator
 from fb import (
     get_posts_and_interactions, get_video_stats, get_video_time_series,
