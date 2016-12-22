@@ -4,7 +4,7 @@ import textwrap
 
 setup(
     name='fb-to-redshift',
-    version='0.1.1',
+    version='0.1.2',
     author='Sandra Chung,Rivkah Standig',
     author_email='opensource@moveon.org',
     packages=['fb-to-redshift'],
