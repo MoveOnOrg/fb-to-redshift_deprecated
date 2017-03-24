@@ -22,22 +22,21 @@ import csv
 
 rsm = None
 
+# for create_import_file
+IMPORT_TYPE_DICTS = {
+    'posts': lambda interval, list_id: get_posts_and_interactions(interval),
+    'videos': lambda interval, list_id: get_video_stats(interval),
+    'video_list': lambda interval, list_id: get_video_stats(interval, list_id),
+    'video_time_series': lambda interval, list_id: get_video_time_series(),
+    'video_viewer_demographics': lambda interval, list_id: get_video_views_demographics(interval),
+    'video_list_viewer_demographics': lambda interval, list_id: get_video_views_demographics(interval, list_id),
+}
+
 def create_import_file(
         interval=False, import_type='posts',filename='fb_import_posts.csv',
         columns=False, list_id=None):
     import_file = open(files_dir + filename, 'w')
-    if import_type == 'posts':
-        data_dict = get_posts_and_interactions(interval)
-    if import_type == 'videos':
-        data_dict = get_video_stats(interval)
-    if import_type == 'video_list':
-        data_dict = get_video_stats(interval, list_id)
-    if import_type == 'video_time_series':
-        data_dict = get_video_time_series()
-    if import_type == 'video_viewer_demographics':
-        data_dict = get_video_views_demographics(interval)
-    if import_type == 'video_list_viewer_demographics':
-        data_dict = get_video_views_demographics(interval, list_id)
+    data_dict = IMPORT_TYPE_DICTS.get(import_type, lambda i,l: None)(interval, list_id)
     if not data_dict:
         print("Could not retrieve %s data" %(import_type))
         return False
