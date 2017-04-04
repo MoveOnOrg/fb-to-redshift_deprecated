@@ -63,6 +63,7 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
   * `['interval']` can be used in combination with `post_limit` to limit the amount of data retrieved by each API call. If you leave `['interval']` set to `False` the script will try to pull all available post or video data.
   * `['tablename']` is used only if `redshift_import` is set to True.
   * **!IMPORTANT**: `data_types` should include only the parameter dictionaries that correspond to CSVs that you want to generate (and maybe import). The script will loop through them to get the corresponding data.
+  * data_type['import_type'] should match the correct value in IMPORT_TYPE_DICTS in fb_tools.py
     
 #### c. (OPTIONAL) Set up Redshift import.
   * Set `redshift_import` to True, and this script will attempt to upload the generated CSVs to an S3 bucket and import the data into Redshift tables.

@@ -15,21 +15,22 @@ from fb import (
     get_posts_and_interactions, get_video_stats, get_video_time_series,
     get_video_views_demographics)
 from settings import (
-    aws_access_key, aws_secret_key, s3_bucket, s3_bucket_dir, files_dir, test)
+    aws_access_key, aws_secret_key, s3_bucket, s3_bucket_dir, files_dir,
+    test)
 import settings
 import boto
 import csv
 
 rsm = None
 
-# for create_import_file
+# for create_import_file in fb_tools.py
 IMPORT_TYPE_DICTS = {
     'posts': lambda interval, list_id: get_posts_and_interactions(interval),
     'videos': lambda interval, list_id: get_video_stats(interval),
     'video_list': lambda interval, list_id: get_video_stats(interval, list_id),
     'video_time_series': lambda interval, list_id: get_video_time_series(),
     'video_viewer_demographics': lambda interval, list_id: get_video_views_demographics(interval),
-    'video_list_viewer_demographics': lambda interval, list_id: get_video_views_demographics(interval, list_id),
+    'video_list_viewer_demographics': lambda interval, list_id: get_video_views_demographics(interval, list_id)
 }
 
 def create_import_file(
