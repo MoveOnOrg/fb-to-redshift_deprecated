@@ -60,6 +60,7 @@ If Python 3 is not your default Python version, you'll need to tell virtualenv w
 
   * If you want to use `video_list` or `video_list_viewer_demographics` to pull video data from only the videos in a particular Facebook Page list, you'll need to get the list_ids.
     * To find the Facebook video list ids, visit [Graph API explorer](https://developers.facebook.com/tools/explorer/) and get a valid Page token. Next to `GET -> /v2.8/` enter `[page_id]?fields=video_lists` and submit to get a list of all the Page video lists and IDs.
+    * You can also supply a string in settings.py for `fb_video_name_key` to get video list IDs from your page with list names matching the string.
   * `['interval']` can be used in combination with `post_limit` to limit the amount of data retrieved by each API call. If you leave `['interval']` set to `False` the script will try to pull all available post or video data.
   * `['tablename']` is used only if `redshift_import` is set to True.
   * **!IMPORTANT**: `data_types` should include only the parameter dictionaries that correspond to CSVs that you want to generate (and maybe import). The script will loop through them to get the corresponding data.

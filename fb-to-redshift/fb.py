@@ -39,6 +39,7 @@ def get_video_list_ids_by_name(list_name):
         for item in res['video_lists']['data']:
             if list_name in item['title']:
                 video_list_ids.append(item['id'])
+        print('video list ids:', video_list_ids)
         return video_list_ids
     else:
         print('looks like get_video_list_ids_by_name did not return data!')

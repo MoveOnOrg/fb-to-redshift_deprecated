@@ -13,6 +13,7 @@ if os.path.exists(local_settings_path):
     settings = imp.load_source('settings', local_settings_path)
 
 from fb_tools import create_import_file, upload_to_s3, update_redshift
+from fb import get_video_list_ids_by_name
 from time import gmtime, strftime
 from settings import (
     test, files_dir, s3_bucket, s3_bucket_dir, data_types, redshift_import)
@@ -24,7 +25,14 @@ def main():
         if test:
             item['tablename'] += '_test'
             item['filename'] = ('_test.').join(item['filename'].split('.'))
-        if 'list_id' in item:
+
+        if 'video_name_key' in item:
+            video_list_ids = get_video_list_ids_by_name(item.get('video_name_key'))
+            for video_list_id in video_list_ids:
+                created_file = create_import_file(
+                    item.get('interval'), item.get('import_type'),
+                    item.get('filename'), item.get('columns'), video_list_id)
+        elif 'list_id' in item:
             created_file = create_import_file(
                 item.get('interval'), item.get('import_type'),
                 item.get('filename'), item.get('columns'), item.get('list_id'))
