@@ -16,6 +16,7 @@ post_limit = '100' # Positive integer. Limit data returned from API.
 user_access_token = ''
 client_id = ''
 client_secret = ''
+token_expiration_date = ''
 
 # Create a parameter dictionary for each data CSV.
 # See README.md for details. Example dictionaries:
