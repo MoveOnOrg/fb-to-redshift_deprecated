@@ -11,6 +11,7 @@ fb_version = 'v2.7'
 fb_page_id = '' # For www.facebook.com/lovecats, fb_page_id = lovecats
 fb_long_token = '' # See README.md
 post_limit = '100' # Positive integer. Limit data returned from API.
+video_name_key = '' # Use to find video lists IDs with names matching a string
 
 # Facebook user access settings
 user_access_token = ''
@@ -116,6 +117,7 @@ video_list['columns'] = ['video_id', 'title', 'description',
     ]
 video_list['primary_key'] = 'video_id'
 video_list['list_id'] = ''
+video_lab_videos['video_name_key'] = fb_video_name_key
 
 video_list_demographics = {}
 video_list_demographics['interval'] = False
@@ -151,6 +153,7 @@ video_list_demographics['columns'] = ['video_id', 'U13_17', 'U18_24', 'U25_34',
     ]
 video_list_demographics['primary_key'] = 'video_id'
 video_list_demographics['list_id'] = ''
+video_lab_videos['video_name_key'] = fb_video_name_key
 
 # Include only dictionaries for desired data.
 data_types = [posts, videos, video_demographics] 

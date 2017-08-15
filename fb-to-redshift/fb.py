@@ -26,6 +26,24 @@ def log_error(content,logfile):
     json.dump(content, error_log, indent=4)
     error_log.close()
 
+def get_video_list_ids_by_name(list_name):
+    """ Retrieve video list IDs with names matching a string for
+        a specific Facebook Page
+    """
+    url = (base_url +
+        '%s/?fields=video_lists&access_token=%s'
+        %(fb_page_id, fb_long_token))
+    res = requests.get(url).json()
+    video_list_ids = []
+    if res:
+        for item in res['video_lists']['data']:
+            if list_name in item['title']:
+                video_list_ids.append(item['id'])
+        print('video list ids:', video_list_ids)
+        return video_list_ids
+    else:
+        print('looks like get_video_list_ids_by_name did not return data!')
+
 def get_posts_and_interactions(interval=False):
     """ Retrieve post data for a specific Facebook Page from a time
         period optionally limited by the 'interval' parameter.
