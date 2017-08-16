@@ -168,13 +168,18 @@ def get_video_stats(interval=False, list_id=False):
         as key and a list of video data as the value.
     """
     now = int(time())
-    if interval == 'week':
+    if isinstance(interval, tuple):
+        since = str(interval[0])
+        now = str(interval[1])
+    elif interval == 'week':
         since = str(now - 604800)
-    if interval == 'month':
+        now = str(now)
+    elif interval == 'month':
         since = str(now - 2592000)
-    if interval == 'year':
+        now = str(now)
+    elif interval == 'year':
         since = str(now - 31536000)
-    now = str(now)
+        now = str(now)
     limit = post_limit
     too_many_videos_at_a_time = True
 
@@ -423,13 +428,18 @@ def get_video_views_demographics(interval = False, list_id = False):
         with video ID as key and a list of video data as the value.
     """
     now = int(time())
-    if interval == 'week':
+    if isinstance(interval, tuple):
+        since = str(interval[0])
+        now = str(interval[1])
+    elif interval == 'week':
         since = str(now - 604800)
-    if interval == 'month':
+        now = str(now)
+    elif interval == 'month':
         since = str(now - 2592000)
-    if interval == 'year':
+        now = str(now)
+    elif interval == 'year':
         since = str(now - 31536000)
-    now = str(now)
+        now = str(now)
     limit = post_limit
     too_many_videos_at_a_time = True
 
