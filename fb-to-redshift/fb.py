@@ -220,9 +220,7 @@ def get_video_stats(interval=False, list_id=False):
                     base_url + 
                     '%s/videos?fields=%s{values,name}&limit=%s&access_token=%s' 
                     %(fb_page_id, video_fields, limit, fb_long_token))
-        print(url) #DEBUG
         videos = requests.get(url).json()
-        print(videos) #DEBUG
         if 'error' in videos:
             log_error(videos,'error_log.json')
             if videos['error']['code'] == 1:
