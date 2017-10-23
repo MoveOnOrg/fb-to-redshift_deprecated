@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+# coding: utf-8
 """ Download data and create CSV. Upload CSV to S3. Import to Redshift.
 """
 

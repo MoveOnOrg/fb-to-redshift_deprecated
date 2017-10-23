@@ -75,7 +75,7 @@ def get_posts_and_interactions(interval=False):
                 '%s/posts?fields=message,created_time,id,'
                 'likes.limit(0).summary(total_count),'
                 'comments.limit(0).summary(total_count),'
-                'shares,'
+                'shares,type,permalink_url,'
                 'insights.metric(post_impressions,post_consumptions_by_type)'
                 '{values,name}'
                 '&limit=%s&since=%s&until=%s&access_token=%s'
@@ -85,12 +85,11 @@ def get_posts_and_interactions(interval=False):
                 '%s/posts?fields=message,created_time,id,'
                 'likes.limit(0).summary(true),'
                 'comments.limit(0).summary(true),'
-                'shares,'
+                'shares,type,permalink_url,'
                 'insights.metric(post_impressions,post_consumptions_by_type)'
                 '{values,name}'
                 '&limit=%s&access_token=%s'
                 %(fb_page_id, limit, fb_long_token))
-        
         posts = requests.get(url).json()
 
         if 'error' in posts:
@@ -125,6 +124,8 @@ def get_posts_and_interactions(interval=False):
                 likes = post.get('likes', {}).get('summary',
                     {}).get('total_count', 0)
                 shares = post.get('shares', {}).get('count', 0)
+                post_type = post.get('type', {})
+                permalink = post.get('permalink_url', {})
                 comments = post.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
                 insights = {}
@@ -142,7 +143,9 @@ def get_posts_and_interactions(interval=False):
                         shares,
                         comments,
                         impressions,
-                        link_clicks
+                        link_clicks,
+                        post_type,
+                        permalink
                         ] # this list and the next must change if the URLS do
                 except KeyError:
                     posts_dict[post['id']] = [
@@ -150,7 +153,11 @@ def get_posts_and_interactions(interval=False):
                         created_time,
                         likes,
                         shares,
-                        comments
+                        comments,
+                        '',
+                        '',
+                        post_type,
+                        permalink
                         ]
             if 'paging' in posts:
                 posts = requests.get(posts['paging']['next']).json()
