@@ -27,7 +27,7 @@ posts['filename'] = 'fb_posts.csv'
 posts['tablename'] = 'facebook.posts'
 posts['columns'] = [
     'post_id', 'message', 'created_time', 'likes',
-    'shares','comments', 'total_reach', 'link_clicks'
+    'shares','comments', 'total_reach', 'link_clicks', 'post_type', 'permalink'
     ]
 posts['primary_key'] = 'post_id'
 
