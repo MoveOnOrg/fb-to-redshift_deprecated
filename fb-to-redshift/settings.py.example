@@ -27,7 +27,7 @@ posts['filename'] = 'fb_posts.csv'
 posts['tablename'] = 'facebook.posts'
 posts['columns'] = [
     'post_id', 'message', 'created_time', 'likes',
-    'shares','comments', 'total_reach', 'link_clicks'
+    'shares','comments', 'total_reach', 'link_clicks', 'post_type', 'permalink'
     ]
 posts['primary_key'] = 'post_id'
 
@@ -37,8 +37,8 @@ videos['import_type'] = 'videos'
 videos['filename'] = 'fb_videos.csv'
 videos['tablename'] = 'facebook.videos'
 videos['columns'] = ['video_id', 'title', 'description',
-    'created_time', 'video_length', 'likes', 'comments', 'reactions',
-    'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers',
+    'created_time', 'video_length', 'likes', 'comments', 'reactions', 'live_status',
+    'universal_video_id', 'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers',
     'views_10sec', 'views_30sec', 'views_95pct', 'avg_sec_watched',
     'avg_completion', 'page_owned_views', 'shared_views', 
     'views_autoplayed', 'views_clicked_to_play', 'views_organic', 
@@ -97,8 +97,8 @@ video_list['import_type'] = 'video_list'
 video_list['filename'] = 'fb_video_list.csv'
 video_list['tablename'] = 'facebook.video_list'
 video_list['columns'] = ['video_id', 'title', 'description',
-    'created_time', 'video_length', 'likes', 'comments', 'reactions',
-    'shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers',
+    'created_time', 'video_length', 'likes', 'comments', 'reactions', 'live_status',
+    'universal_video_id','shares', 'reach', 'ms_viewed ', 'total_views', 'unique_viewers',
     'views_10sec', 'views_30sec', 'views_95pct', 'avg_sec_watched',
     'avg_completion', 'page_owned_views', 'shared_views', 
     'views_autoplayed', 'views_clicked_to_play', 'views_organic', 

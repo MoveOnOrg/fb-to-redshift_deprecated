@@ -185,7 +185,8 @@ def get_video_stats(interval=False, list_id=False):
             if interval:
                 url = (
                     base_url +
-                    '%s/?fields=videos{title,description,created_time,length,'
+                    '%s/?fields=videos{title,description,created_time,'
+                    'length,live_status,universal_video_id,'
                     'likes.limit(0).summary(total_count),'
                     'comments.limit(0).summary(total_count),'
                     'reactions.limit(0).summary(total_count),'
@@ -195,7 +196,8 @@ def get_video_stats(interval=False, list_id=False):
             else:
                 url = (
                     base_url +
-                    '%s/?fields=videos{title,description,created_time,length,'
+                    '%s/?fields=videos{title,description,created_time,'
+                    'length,live_status,universal_video_id,'
                     'likes.limit(0).summary(total_count),'
                     'comments.limit(0).summary(total_count),'
                     'reactions.limit(0).summary(total_count),'
@@ -206,7 +208,8 @@ def get_video_stats(interval=False, list_id=False):
             if interval:
                 url = (
                     base_url + 
-                    '%s/videos?fields=title,description,created_time,length,'
+                    '%s/videos?fields=title,description,created_time,'
+                    'length,live_status,universal_video_id,'
                     'comments.limit(0).summary(total_count),'
                     'likes.limit(0).summary(total_count),'
                     'reactions.limit(0).summary(total_count),'
@@ -216,7 +219,8 @@ def get_video_stats(interval=False, list_id=False):
             else:
                 url = (
                     base_url + 
-                    '%s/videos?fields=title,description,created_time,length,'
+                    '%s/videos?fields=title,description,created_time,'
+                    'length,live_status,universal_video_id,'
                     'comments.limit(0).summary(total_count),'
                     'likes.limit(0).summary(total_count),'
                     'reactions.limit(0).summary(total_count),'
@@ -249,24 +253,27 @@ def get_video_stats(interval=False, list_id=False):
             videos = videos['videos']
         while pagination:
             for video in videos['data']:
+                import pdb; pdb.set_trace()
                 title = video.get('title', '').replace('\n', ' ').replace(',', ' ')
                 description = video.get('description', '').replace('\n',
                     ' ').replace(',', ' ').replace('"','')
                 created_time = video['created_time'].replace('T',
                     ' ').replace('+0000', '')
                 length = video['length']
+                live_status = video['live_status']
+                universal_video_id = video['universal_video_id']
                 likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
                 comments = video.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
                 reactions = video.get('reactions', {}).get('summary',
-                    {}).get('total_count', 0)
+                    {}).get('total_count', 0)             
                 
                 insights = {}
                 try:
                     insights_data = video['video_insights']['data']
                 except KeyError:
                     videos_dict[video['id']] = [title, description, created_time,
-                    length, likes, comments, reactions]
+                    length, likes, comments, reactions, live_status, universal_video_id]
                 else:
                     for insight in insights_data:
                         insights[insight['name']] = insight['values'][0]['value']
