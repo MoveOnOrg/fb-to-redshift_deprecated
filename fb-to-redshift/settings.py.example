@@ -7,7 +7,7 @@ redshift_import = False # If False, skip S3 and Redshift import.
 test = False # adds _test to tablename and CSV name
 
 # Facebook Graph API settings
-fb_version = 'v2.7'
+fb_version = 'v2.10'
 fb_page_id = '' # For www.facebook.com/lovecats, fb_page_id = lovecats
 fb_long_token = '' # See README.md
 post_limit = '100' # Positive integer. Limit data returned from API.
