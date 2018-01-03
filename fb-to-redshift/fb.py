@@ -196,7 +196,9 @@ def get_video_stats(interval=False, list_id=False):
                 'likes.limit(0).summary(total_count)',
                 'comments.limit(0).summary(total_count)',
                 'reactions.limit(0).summary(total_count)',
-                'video_insights'
+                'video_insights',
+                'live_status',
+                'universal_video_id'
                 ])
         if list_id:
             if interval:
@@ -251,6 +253,8 @@ def get_video_stats(interval=False, list_id=False):
                 created_time = video['created_time'].replace('T',
                     ' ').replace('+0000', '')
                 length = video['length']
+                live_status = video.get('live_status', '')
+                universal_video_id = video.get('universal_video_id', '')
                 likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
                 comments = video.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
@@ -262,7 +266,7 @@ def get_video_stats(interval=False, list_id=False):
                     insights_data = video['video_insights']['data']
                 except KeyError:
                     videos_dict[video['id']] = [title, description, created_time,
-                    length, likes, comments, reactions]
+                    length, live_status, universal_video_id, likes, comments, reactions]
                 else:
                     for insight in insights_data:
                         insights[insight['name']] = insight['values'][0]['value']
@@ -280,7 +284,8 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_avg_time_watched'])/length/1000.0, 3)
                     videos_dict[video['id']] = [
                         title, description, created_time,
-                        length, likes, comments, reactions, shares, 
+                        length,
+                        likes, comments, reactions, shares,
                         insights['total_video_impressions_unique'],
                         insights['total_video_view_total_time'], 
                         insights['total_video_views'],
@@ -323,7 +328,10 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_impressions_fan_unique'],
                         insights['total_video_impressions_fan'],
                         insights['total_video_impressions_fan_paid_unique'],
-                        insights['total_video_impressions_fan_paid']]   
+                        insights['total_video_impressions_fan_paid'],
+                        live_status,
+                        universal_video_id
+                    ]
             try: 
                 videos = requests.get(videos['paging']['next']).json()
             except KeyError:
