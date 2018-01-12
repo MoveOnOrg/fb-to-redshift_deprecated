@@ -159,7 +159,7 @@ def get_posts_and_interactions(interval=False):
                         post_type,
                         permalink
                         ]
-            if 'paging' in posts:
+            if 'next' in posts['paging']:
                 posts = requests.get(posts['paging']['next']).json()
             else:
                 pagination = False
