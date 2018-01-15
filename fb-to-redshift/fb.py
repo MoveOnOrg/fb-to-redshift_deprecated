@@ -284,7 +284,7 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_avg_time_watched'])/length/1000.0, 3)
                     videos_dict[video['id']] = [
                         title, description, created_time,
-                        length,
+                        length,live_status, universal_video_id,
                         likes, comments, reactions, shares,
                         insights['total_video_impressions_unique'],
                         insights['total_video_view_total_time'], 
@@ -328,9 +328,7 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_impressions_fan_unique'],
                         insights['total_video_impressions_fan'],
                         insights['total_video_impressions_fan_paid_unique'],
-                        insights['total_video_impressions_fan_paid'],
-                        live_status,
-                        universal_video_id
+                        insights['total_video_impressions_fan_paid']
                     ]
             try: 
                 videos = requests.get(videos['paging']['next']).json()
