@@ -200,7 +200,8 @@ def get_video_stats(interval=False, list_id=False):
                 'reactions.limit(0).summary(total_count)',
                 'video_insights',
                 'live_status',
-                'universal_video_id'
+                'universal_video_id',
+                'is_crosspost_video'
                 ])
         if list_id:
             if interval:
@@ -256,13 +257,13 @@ def get_video_stats(interval=False, list_id=False):
                     ' ').replace('+0000', '')
                 length = video['length']
                 live_status = video.get('live_status', '')
+                is_crosspost_video = int(video.get('is_crosspost_video', False))
                 universal_video_id = video.get('universal_video_id', '')
                 likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
                 comments = video.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
                 reactions = video.get('reactions', {}).get('summary',
                     {}).get('total_count', 0)
-                
                 insights = {}
                 try:
                     insights_data = video['video_insights']['data']
@@ -330,7 +331,8 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_impressions_fan_unique'],
                         insights['total_video_impressions_fan'],
                         insights['total_video_impressions_fan_paid_unique'],
-                        insights['total_video_impressions_fan_paid']
+                        insights['total_video_impressions_fan_paid'],
+                        is_crosspost_video
                     ]
             try:
                 videos = requests.get(videos['paging']['next']).json()
