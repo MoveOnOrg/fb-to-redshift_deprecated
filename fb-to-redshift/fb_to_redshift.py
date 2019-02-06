@@ -47,10 +47,10 @@ def main():
         if redshift_import:
             upload_to_s3(item.get('filename'))
             print(
-                "uploaded %s to s3 bucket s3://%s/%s" 
+                "uploaded %s to s3 bucket s3://%s/%s"
                 %(files_dir + item.get('filename'), s3_bucket_dir, s3_bucket))
             update_redshift(
-                item.get('tablename'), item.get('columns'), 
+                item.get('tablename'), item.get('columns'),
                 item.get('primary_key'), item.get('filename'))
             print("updated redshift table " + item.get('tablename'))
     print("Done!")
