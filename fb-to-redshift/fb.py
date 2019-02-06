@@ -99,9 +99,11 @@ def get_posts_and_interactions(interval=False):
                 limit = str(int(limit) - 5) # try again with a smaller request
             elif posts['error']['code'] == 190:
                 print('bad access_token! see error log for details')
+                limit = -1
                 break
             else:
                 print('API error code ' + str(posts['error']['code']))
+                limit = -1
                 break
         else:
             too_many_posts_at_a_time = False

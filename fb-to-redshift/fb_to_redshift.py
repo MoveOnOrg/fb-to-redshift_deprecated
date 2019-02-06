@@ -22,6 +22,7 @@ def main():
     print()
     print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     for item in data_types:
+        print('Importing %s' % item.get('import_type'))
         if test:
             item['tablename'] += '_test'
             item['filename'] = ('_test.').join(item['filename'].split('.'))
