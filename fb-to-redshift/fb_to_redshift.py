@@ -22,6 +22,7 @@ def main():
     print()
     print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     for item in data_types:
+        print('Importing %s' % item.get('import_type'))
         if test:
             item['tablename'] += '_test'
             item['filename'] = ('_test.').join(item['filename'].split('.'))
@@ -47,10 +48,10 @@ def main():
         if redshift_import:
             upload_to_s3(item.get('filename'))
             print(
-                "uploaded %s to s3 bucket s3://%s/%s" 
+                "uploaded %s to s3 bucket s3://%s/%s"
                 %(files_dir + item.get('filename'), s3_bucket_dir, s3_bucket))
             update_redshift(
-                item.get('tablename'), item.get('columns'), 
+                item.get('tablename'), item.get('columns'),
                 item.get('primary_key'), item.get('filename'))
             print("updated redshift table " + item.get('tablename'))
     print("Done!")

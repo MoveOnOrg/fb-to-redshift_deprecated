@@ -47,10 +47,10 @@ def get_video_list_ids_by_name(list_name):
 def get_posts_and_interactions(interval=False):
     """ Retrieve post data for a specific Facebook Page from a time
         period optionally limited by the 'interval' parameter.
-        Return a dictionary with post ID as key and list of post 
+        Return a dictionary with post ID as key and list of post
         data as the value.
     """
-    
+
     now = int(time())
     if interval == 'week':
         since = str(now - 604800)
@@ -58,12 +58,12 @@ def get_posts_and_interactions(interval=False):
         since = str(now - 2592000)
     if interval == 'year':
         since = str(now - 31536000)
-    now = str(now)    
+    now = str(now)
     limit = post_limit
     too_many_posts_at_a_time = True
 
-    # If you try to grab too much data at once, the Graph API 
-    # returns an error. This script will keep trying to grab 
+    # If you try to grab too much data at once, the Graph API
+    # returns an error. This script will keep trying to grab
     # incrementally smaller amounts of data until it succeeds
     # or it runs out of chances.
 
@@ -99,9 +99,11 @@ def get_posts_and_interactions(interval=False):
                 limit = str(int(limit) - 5) # try again with a smaller request
             elif posts['error']['code'] == 190:
                 print('bad access_token! see error log for details')
+                limit = -1
                 break
             else:
                 print('API error code ' + str(posts['error']['code']))
+                limit = -1
                 break
         else:
             too_many_posts_at_a_time = False
@@ -198,29 +200,30 @@ def get_video_stats(interval=False, list_id=False):
                 'reactions.limit(0).summary(total_count)',
                 'video_insights',
                 'live_status',
-                'universal_video_id'
+                'universal_video_id',
+                'is_crosspost_video'
                 ])
         if list_id:
             if interval:
                 url = (
                     base_url +
-                    '%s/?fields=videos{%s}&limit=%s&since=%s&until=%s&access_token=%s' 
+                    '%s/?fields=videos{%s}&limit=%s&since=%s&until=%s&access_token=%s'
                     %(list_id, video_fields,limit, since, now, fb_long_token))
             else:
                 url = (
                     base_url +
-                    '%s/?fields=videos{%s}&limit=%s&access_token=%s' 
+                    '%s/?fields=videos{%s}&limit=%s&access_token=%s'
                     %(list_id, video_fields, limit, fb_long_token))
         else:
             if interval:
                 url = (
-                    base_url + 
-                    '%s/videos?fields=%s{values,name}&limit=%s&since=%s&until=%s&access_token=%s' 
+                    base_url +
+                    '%s/videos?fields=%s{values,name}&limit=%s&since=%s&until=%s&access_token=%s'
                     %(fb_page_id, video_fields, limit, since, now, fb_long_token))
             else:
                 url = (
-                    base_url + 
-                    '%s/videos?fields=%s{values,name}&limit=%s&access_token=%s' 
+                    base_url +
+                    '%s/videos?fields=%s{values,name}&limit=%s&access_token=%s'
                     %(fb_page_id, video_fields, limit, fb_long_token))
         videos = requests.get(url).json()
         if 'error' in videos:
@@ -254,13 +257,13 @@ def get_video_stats(interval=False, list_id=False):
                     ' ').replace('+0000', '')
                 length = video['length']
                 live_status = video.get('live_status', '')
+                is_crosspost_video = int(video.get('is_crosspost_video', False))
                 universal_video_id = video.get('universal_video_id', '')
                 likes = video.get('likes', {}).get('summary', {}).get('total_count', 0)
                 comments = video.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
                 reactions = video.get('reactions', {}).get('summary',
                     {}).get('total_count', 0)
-                
                 insights = {}
                 try:
                     insights_data = video['video_insights']['data']
@@ -287,11 +290,11 @@ def get_video_stats(interval=False, list_id=False):
                         length,live_status, universal_video_id,
                         likes, comments, reactions, shares,
                         insights['total_video_impressions_unique'],
-                        insights['total_video_view_total_time'], 
+                        insights['total_video_view_total_time'],
                         insights['total_video_views'],
                         insights['total_video_views_unique'],
                         insights['total_video_10s_views_unique'],
-                        insights['total_video_30s_views_unique'], 
+                        insights['total_video_30s_views_unique'],
                         insights['total_video_complete_views'],
                         avg_sec_watched, avg_completion,
                         page_owned_views, shared_views,
@@ -328,9 +331,10 @@ def get_video_stats(interval=False, list_id=False):
                         insights['total_video_impressions_fan_unique'],
                         insights['total_video_impressions_fan'],
                         insights['total_video_impressions_fan_paid_unique'],
-                        insights['total_video_impressions_fan_paid']
+                        insights['total_video_impressions_fan_paid'],
+                        is_crosspost_video
                     ]
-            try: 
+            try:
                 videos = requests.get(videos['paging']['next']).json()
             except KeyError:
                 pagination = False
@@ -342,10 +346,10 @@ def get_video_stats(interval=False, list_id=False):
 def get_video_time_series(start_date = time_series_start_date):
     """ Retrieve video statistics for a specific Facebook Page from
         a time period optionally limited by time_series_start_date.
-        Return a dictionary with video ID as key and a list of video 
+        Return a dictionary with video ID as key and a list of video
         data as the value.
     """
-    
+
     since = int(datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S').timestamp())
     now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     too_many_videos_at_a_time = True
@@ -362,7 +366,7 @@ def get_video_time_series(start_date = time_series_start_date):
             ])
         url = (
             base_url +
-            '%s/videos?fields=%s&limit=%s&since=%s&access_token=%s' 
+            '%s/videos?fields=%s&limit=%s&since=%s&access_token=%s'
             %(fb_page_id, video_ts_fields, limit, since, fb_long_token))
 
         videos = requests.get(url).json()
@@ -379,7 +383,7 @@ def get_video_time_series(start_date = time_series_start_date):
                break
         else:
             too_many_videos_at_a_time = False
-    
+
     if int(limit) <= 0:
         print("Failed to retrieve video time series data. Logged errors to error_log.json")
         return False
@@ -394,7 +398,7 @@ def get_video_time_series(start_date = time_series_start_date):
                 comments = video.get('comments', {}).get('summary',
                     {}).get('total_count', 0)
                 reactions = video.get('reactions', {}).get('summary',
-                    {}).get('total_count', 0)          
+                    {}).get('total_count', 0)
                 insights = {}
                 try:
                     insights_data = video['video_insights']['data']
@@ -404,7 +408,7 @@ def get_video_time_series(start_date = time_series_start_date):
                     for insight in insights_data:
                         insights[insight['name']] = insight['values'][0]['value']
                     shares = insights.get('total_video_stories_by_action_type',
-                        {}).get('share', 0)               
+                        {}).get('share', 0)
                     videos_dict[video['id']] = [
                         title, created_time, now,
                         likes, comments, reactions,
@@ -415,7 +419,7 @@ def get_video_time_series(start_date = time_series_start_date):
                         insights['total_video_view_total_time'],
                         shares
                         ]
-            try: 
+            try:
                 videos = requests.get(videos['paging']['next']).json()
             except KeyError:
                 pagination = False
@@ -457,18 +461,18 @@ def get_video_views_demographics(interval = False, list_id = False):
             else:
                 url = (
                     base_url +
-                    '%s/?fields=videos{video_insights.metric(%s)}&limit=%s&access_token=%s' 
+                    '%s/?fields=videos{video_insights.metric(%s)}&limit=%s&access_token=%s'
                     %(list_id, video_demo_fields, limit, fb_long_token))
         else:
             if interval:
                 url = (
-                    base_url + 
-                    '%s/videos?fields=video_insights.metric(%s){values,name}&limit=%s&since=%s&until=%s&access_token=%s' 
+                    base_url +
+                    '%s/videos?fields=video_insights.metric(%s){values,name}&limit=%s&since=%s&until=%s&access_token=%s'
                     %(fb_page_id, video_demo_fields, limit, since, now, fb_long_token))
             else:
                 url = (
                     base_url +
-                    '%s/videos?fields=video_insights.metric(%s{values,name}&limit=%s&access_token=%s' 
+                    '%s/videos?fields=video_insights.metric(%s{values,name}&limit=%s&access_token=%s'
                     %(fb_page_id, video_demo_fields, limit, fb_long_token))
 
         videos = requests.get(url).json()
@@ -485,7 +489,7 @@ def get_video_views_demographics(interval = False, list_id = False):
                break
         else:
             too_many_videos_at_a_time = False
-    
+
     if int(limit) <= 0:
         print("Failed to retrieve video demographics data. Logged errors to error_log.json")
         return False
@@ -527,7 +531,7 @@ def get_video_views_demographics(interval = False, list_id = False):
                         age_gender_data = ['' for x in range(21)]
                         print("no age or gender data for video %s" %video['id'])
                     videos_dict[video['id']] = age_gender_data + regions_data
-            try: 
+            try:
                 videos = requests.get(videos['paging']['next']).json()
             except KeyError:
                 pagination = False
