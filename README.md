@@ -1,4 +1,6 @@
-# Facebook to Redshift
+# DEPRECATED - Facebook to Redshift
+
+As of January 2023 we are automatically pulling in Facebook data through our ETL vendor, and have not used this script in some time.
 
 This project connects to the Facebook Graph API (v2.7), downloads the latest data about posts and videos associated with a target Page, and formats and outputs the data as CSVs. It also (optionally) uploads the CSVs into an Amazon S3 bucket and imports the data into a corresponding table into Redshift using the `copy` command.
 
